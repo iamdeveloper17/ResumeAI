@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const updateSchema = z.object({
   title: z.string().optional(),
-  template: z.enum(["modern", "classic"]).optional(),
+  template: z.string().optional(),
   accentColor: z.string().optional(),
   personal: z.any().optional(),
   experience: z.any().optional(),
@@ -15,7 +15,7 @@ const updateSchema = z.object({
   projects: z.any().optional(),
   certifications: z.any().optional(),
   languages: z.any().optional(),
-});
+}).passthrough();   // ← YE IMPORTANT HAI
 
 // GET - Load resume
 export async function GET(
