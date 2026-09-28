@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+// ─── Types ───
 export interface Experience {
   _id: string;
   company: string;
@@ -94,6 +95,7 @@ interface ResumeStore {
   addSkill: () => void;
   updateSkill: (id: string, data: Partial<Skill>) => void;
   removeSkill: (id: string) => void;
+  setSkills: (skills: Skill[]) => void; // ← NEW
 
   // Projects
   addProject: () => void;
@@ -132,7 +134,7 @@ export const emptyResume: ResumeData = {
   certifications: [],
 };
 
-// Step validation
+// ─── Step Validation ───
 export interface ValidationError {
   field: string;
   message: string;
@@ -157,8 +159,6 @@ export function validateStep(
       break;
 
     case 1: // Experience
-      // Experience optional hai — koi validation nahi (fresher bhi ho sakta hai)
-      // But agar user ne add kiya hai to required fields bhare hone chahiye
       data.experience.forEach((exp, i) => {
         if (!exp.company.trim())
           errors.push({
@@ -174,7 +174,6 @@ export function validateStep(
       break;
 
     case 2: // Education
-      // Education optional hai
       data.education.forEach((edu, i) => {
         if (!edu.institution.trim())
           errors.push({
@@ -190,7 +189,6 @@ export function validateStep(
       break;
 
     case 3: // Skills
-      // Skills optional
       data.skills.forEach((skill, i) => {
         if (!skill.category.trim())
           errors.push({
@@ -201,7 +199,7 @@ export function validateStep(
       break;
 
     case 4: // Projects
-      // Projects optional
+      // Optional
       break;
 
     default:
@@ -211,14 +209,14 @@ export function validateStep(
   return errors;
 }
 
+// ─── Store ───
 export const useResumeStore = create<ResumeStore>((set) => ({
   data: emptyResume,
   currentStep: 0,
   isSaving: false,
   lastSaved: null,
 
-  setData: (data) =>
-    set((state) => ({ data: { ...state.data, ...data } })),
+  setData: (data) => set((state) => ({ data: { ...state.data, ...data } })),
 
   setPersonal: (personal) =>
     set((state) => ({
@@ -232,7 +230,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
   setIsSaving: (isSaving) => set({ isSaving }),
   setLastSaved: (date) => set({ lastSaved: date }),
 
-  // Experience
+  // ─── Experience ───
   addExperience: () =>
     set((state) => ({
       data: {
@@ -308,7 +306,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  // Education
+  // ─── Education ───
   addEducation: () =>
     set((state) => ({
       data: {
@@ -346,7 +344,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  // Skills
+  // ─── Skills ───
   addSkill: () =>
     set((state) => ({
       data: {
@@ -376,14 +374,26 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  // Projects
+  // ✅ NEW: setSkills — for AI skill suggestion
+  setSkills: (skills) =>
+    set((state) => ({
+      data: { ...state.data, skills },
+    })),
+
+  // ─── Projects ───
   addProject: () =>
     set((state) => ({
       data: {
         ...state.data,
         projects: [
           ...state.data.projects,
-          { _id: uid(), name: "", description: "", techStack: [""], link: "" },
+          {
+            _id: uid(),
+            name: "",
+            description: "",
+            techStack: [""],
+            link: "",
+          },
         ],
       },
     })),
@@ -406,7 +416,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  // Certifications
+  // ─── Certifications ───
   addCertification: () =>
     set((state) => ({
       data: {

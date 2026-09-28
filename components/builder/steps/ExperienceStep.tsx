@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
+import { toast } from "sonner";
 import { useResumeStore } from "@/lib/resumeStore";
 import { Plus, Trash2, X } from "lucide-react";
 import AutocompleteInput from "@/components/ui/autocomplete-input";
-import { CITIES, JOB_TITLES, COMPANIES } from "@/lib/data/suggestions-db";
-
+// import AIButton from "@/components/builder/AIButton";
 import {
-  COMPANY_SUGGESTIONS,
-  JOB_TITLE_SUGGESTIONS,
-} from "@/lib/suggestions";
+  CITIES,
+  JOB_TITLES,
+  COMPANIES,
+} from "@/lib/data/suggestions-db";
 
 interface ExperienceStepProps {
   errors?: Record<string, string>;
@@ -25,11 +27,53 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
     removeBullet,
   } = useResumeStore();
 
+  const [enhancingId, setEnhancingId] = useState<string | null>(null);
+
   const inputClass = (field: string) =>
-    `w-full px-3 py-2 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors[field]
-      ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-      : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10"
+    `w-full px-3 py-2 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${
+      errors[field]
+        ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
+        : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10"
     }`;
+
+  // ─── AI Bullet Enhancer ───
+  const handleEnhanceBullet = async (
+    expId: string,
+    bulletIndex: number,
+    bulletText: string
+  ) => {
+    if (!bulletText || bulletText.trim().length < 3) {
+      toast.error("Write something first, then enhance with AI");
+      return;
+    }
+
+    const uniqueId = `${expId}-${bulletIndex}`;
+    setEnhancingId(uniqueId);
+
+    try {
+      const jobTitle = data.personal.jobTitle || "Professional";
+
+      const res = await fetch("/api/ai/enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bullet: bulletText, jobTitle }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to enhance");
+      }
+
+      updateBullet(expId, bulletIndex, result.enhanced);
+      toast.success("✨ Bullet enhanced!");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Failed to enhance bullet");
+    } finally {
+      setEnhancingId(null);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -154,31 +198,36 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
             I currently work here
           </label>
 
+          {/* Bullets with AI */}
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-2">
               Key Achievements
             </label>
             <div className="space-y-2">
-              {exp.bullets.map((bullet, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    className={`${inputClass("")} flex-1`}
-                    placeholder="Built a feature that increased engagement by 30%"
-                    value={bullet}
-                    onChange={(e) =>
-                      updateBullet(exp._id, i, e.target.value)
-                    }
-                  />
-                  {exp.bullets.length > 1 && (
-                    <button
-                      onClick={() => removeBullet(exp._id, i)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
+              {exp.bullets.map((bullet, i) => {
+                const isEnhancing =
+                  enhancingId === `${exp._id}-${i}`;
+                return (
+                  <div key={i} className="flex gap-2 items-start">
+                    <input
+                      className={`${inputClass("")} flex-1`}
+                      placeholder="Built a feature that increased engagement by 30%"
+                      value={bullet}
+                      onChange={(e) =>
+                        updateBullet(exp._id, i, e.target.value)
+                      }
+                    />
+                    {exp.bullets.length > 1 && (
+                      <button
+                        onClick={() => removeBullet(exp._id, i)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <button
               onClick={() => addBullet(exp._id)}

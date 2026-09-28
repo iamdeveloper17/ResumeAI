@@ -1,27 +1,90 @@
 "use client";
 
-import { useResumeStore } from "@/lib/resumeStore";
-import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useResumeStore, type Skill } from "@/lib/resumeStore";
+import { Plus, Trash2, Sparkles } from "lucide-react";
 import SkillsInput from "@/components/ui/skills-input";
+// import AIButton from "@/components/builder/AIButton";
 
 interface SkillsStepProps {
   errors?: Record<string, string>;
 }
 
 export default function SkillsStep({ errors = {} }: SkillsStepProps) {
-  const { data, addSkill, updateSkill, removeSkill } = useResumeStore();
+  const { data, addSkill, updateSkill, removeSkill, setSkills } =
+    useResumeStore();
+  const [suggesting, setSuggesting] = useState(false);
+
+  // ─── AI Skill Suggester ───
+  const handleSuggestSkills = async () => {
+    const jobTitle = data.personal.jobTitle;
+
+    if (!jobTitle || jobTitle.trim().length < 2) {
+      toast.error("Please fill Job Title in Personal Info step first");
+      return;
+    }
+
+    setSuggesting(true);
+    const toastId = toast.loading(`✨ Suggesting skills for "${jobTitle}"...`);
+
+    try {
+      const res = await fetch("/api/ai/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobTitle }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to suggest skills");
+      }
+
+      const suggestedSkills: string[] = result.skills || [];
+
+      if (suggestedSkills.length === 0) {
+        throw new Error("No skills found");
+      }
+
+      // Create new category with AI suggested skills
+      const newCategory: Skill = {
+        _id: Math.random().toString(36).slice(2),
+        category: `AI Suggested for ${jobTitle}`,
+        items: suggestedSkills,
+      };
+
+      setSkills([...data.skills, newCategory]);
+
+      toast.success(
+        `✨ Added ${suggestedSkills.length} skills for "${jobTitle}"!`,
+        { id: toastId }
+      );
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Failed to suggest skills", {
+        id: toastId,
+      });
+    } finally {
+      setSuggesting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
+      {/* AI Suggest Banner */}
+
       {data.skills.length === 0 && (
         <div className="text-center py-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
-          <p className="text-sm text-slate-500 mb-4">No skill categories yet</p>
+          <p className="text-sm text-slate-500 mb-4">
+            No skill categories yet
+          </p>
           <button
             onClick={addSkill}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all"
           >
             <Plus className="w-4 h-4" />
-            Add Skill Category
+            Add Skill Category Manually
           </button>
         </div>
       )}

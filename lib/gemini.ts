@@ -1,100 +1,124 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-export const geminiModel = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",     // ← Latest model
-  generationConfig: {
-    temperature: 0.7,
-    maxOutputTokens: 800,
-  },
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || "",
 });
 
+const MODEL_NAME = "gemini-flash-latest";   // ← Ye auto-detect karega
+
+// ─── AI Summary Generator ───
 export async function generateSummary(
+  fullName: string,
   jobTitle: string,
   experience: string,
   skills: string[]
 ): Promise<string> {
-  const prompt = `You are a professional resume writer. Generate a compelling 3-4 sentence professional summary for a ${jobTitle}.
+  const prompt = `You are a professional resume writer. Write a compelling professional summary for a resume.
 
-Experience: ${experience}
-Key skills: ${skills.join(", ")}
-
-Requirements:
-- Write in first person or third person (no "I")
-- Focus on impact and achievements
-- Use strong action words
-- Keep it 50-80 words
-- No bullet points, just one paragraph
-- Don't include "Summary:" prefix
-
-Output only the summary text, nothing else.`;
-
-  const result = await geminiModel.generateContent(prompt);
-  return result.response.text().trim();
-}
-
-export async function enhanceBullet(bullet: string, jobTitle: string): Promise<string> {
-  const prompt = `You are a professional resume writer. Enhance this work experience bullet point for a ${jobTitle}:
-
-Original: "${bullet}"
+Candidate details:
+- Name: ${fullName || "Professional"}
+- Target Role: ${jobTitle || "Software Developer"}
+- Experience: ${experience || "Fresher / No experience yet"}
+- Key Skills: ${skills.length > 0 ? skills.join(", ") : "General technical skills"}
 
 Requirements:
-- Start with a strong action verb
-- Add quantifiable metrics if possible (use realistic numbers like %, $, time saved)
-- Keep it to one line (max 20 words)
-- Focus on impact and results
-- No bullet symbol prefix
+- Write in FIRST PERSON without using "I" (e.g., "Full Stack Developer with 3+ years...")
+- 2-3 sentences only (40-60 words total)
+- Include: years of experience, key skills, biggest strength, what makes them unique
+- Use strong action words and quantify if possible
+- Professional tone, no fluff
+- DO NOT add prefix like "Summary:" or "Professional Summary:"
 
-Output only the enhanced bullet, nothing else.`;
+Output ONLY the summary text, nothing else.`;
 
-  const result = await geminiModel.generateContent(prompt);
-  return result.response.text().trim();
+  try {
+    const interaction = await ai.interactions.create({
+      model: MODEL_NAME,
+      input: prompt,
+    });
+
+    const text = interaction.output_text;
+    if (!text) throw new Error("Empty response from Gemini");
+    return text.trim();
+  } catch (error: any) {
+    console.error("Gemini generateSummary error:", error.message || error);
+    throw new Error(error.message || "Failed to generate summary");
+  }
 }
 
+// ─── AI Bullet Enhancer ───
+export async function enhanceBullet(
+  bullet: string,
+  jobTitle: string
+): Promise<string> {
+  if (!bullet || bullet.trim().length < 3) {
+    throw new Error("Bullet text too short to enhance");
+  }
+
+  const prompt = `You are a professional resume writer. Enhance this work experience bullet point to make it impactful.
+
+Job Role: ${jobTitle || "Software Developer"}
+Original Bullet: "${bullet}"
+
+Requirements:
+- Start with a strong action verb (Developed, Implemented, Led, Optimized, etc.)
+- Add quantifiable metric if reasonable (percentage, time saved, users, revenue, etc.)
+- 1 sentence, max 20-25 words
+- Focus on IMPACT and RESULT, not just activity
+- Use past tense
+- Do NOT include bullet symbol (•, -, *)
+
+Output ONLY the enhanced bullet point, nothing else.`;
+
+  try {
+    const interaction = await ai.interactions.create({
+      model: MODEL_NAME,
+      input: prompt,
+    });
+
+    const text = interaction.output_text;
+    if (!text) throw new Error("Empty response from Gemini");
+    return text.trim().replace(/^[•\-\*]\s*/, "");
+  } catch (error: any) {
+    console.error("Gemini enhanceBullet error:", error.message || error);
+    throw new Error(error.message || "Failed to enhance bullet");
+  }
+}
+
+// ─── AI Skill Suggester ───
 export async function suggestSkills(jobTitle: string): Promise<string[]> {
-  const prompt = `List 10 essential technical and soft skills for a ${jobTitle} role in 2026.
+  if (!jobTitle || jobTitle.trim().length < 2) {
+    throw new Error("Job title required");
+  }
+
+  const prompt = `List the 10 most important technical and soft skills for a "${jobTitle}" role in 2026.
 
 Requirements:
 - Mix of technical and soft skills
-- Industry-relevant and current
-- Most important first
+- Industry-current and in-demand
+- Most critical skills first
 
-Output format: comma-separated list only, no numbering, no explanations.
-Example: React, Node.js, TypeScript, Communication`;
+Output format: ONLY comma-separated list. Example: React, Node.js, MongoDB, TypeScript, Communication, Problem Solving
 
-  const result = await geminiModel.generateContent(prompt);
-  const text = result.response.text().trim();
-  return text
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .slice(0, 10);
-}
+No numbering, no explanations, no bullet points.`;
 
-export async function generateCoverLetter(
-  jobTitle: string,
-  company: string,
-  experience: string,
-  skills: string[]
-): Promise<string> {
-  const prompt = `Write a professional cover letter for a ${jobTitle} position at ${company}.
+  try {
+    const interaction = await ai.interactions.create({
+      model: MODEL_NAME,
+      input: prompt,
+    });
 
-Candidate background:
-Experience: ${experience}
-Skills: ${skills.join(", ")}
+    const text = interaction.output_text;
+    if (!text) throw new Error("Empty response from Gemini");
 
-Requirements:
-- 3 paragraphs (opening, body, closing)
-- Professional but warm tone
-- Highlight relevant experience
-- Express genuine interest in the company
-- 200-250 words total
-- No placeholder brackets like [Your Name]
-- End with "Sincerely,"
-
-Output only the cover letter body (no header/address).`;
-
-  const result = await geminiModel.generateContent(prompt);
-  return result.response.text().trim();
+    return text
+      .trim()
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, 10);
+  } catch (error: any) {
+    console.error("Gemini suggestSkills error:", error.message || error);
+    throw new Error(error.message || "Failed to suggest skills");
+  }
 }
