@@ -1,32 +1,31 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
-import Resume from "@/models/Resume";
-import { generateSlug } from "@/lib/utils";
+"use client";
 
-export default async function NewResumePage() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useResumeStore, emptyResume } from "@/lib/resumeStore";
+import { Loader2 } from "lucide-react";
 
-  await connectDB();
+export default function NewResumePage() {
+  const router = useRouter();
+  const { setResumeId, setData, setStep, setLastSaved } = useResumeStore();
 
-  // Create empty resume
-  const resume = await Resume.create({
-    userId: session.user.id,
-    title: "Untitled Resume",
-    slug: generateSlug(10),
-    template: "modern",
-    accentColor: "#2563eb",
-    personal: {},
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    certifications: [],
-    languages: [],
-  });
+  useEffect(() => {
+    // Reset store to empty state
+    setResumeId(null);
+    setData(emptyResume);
+    setStep(0);
+    setLastSaved(null as any);
 
-  redirect(`/build/${resume._id}`);
+    // Redirect to builder with "new" id
+    router.replace("/build/new");
+  }, [router, setResumeId, setData, setStep, setLastSaved]);
+
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
+        <p className="text-sm text-slate-500">Starting new resume...</p>
+      </div>
+    </div>
+  );
 }

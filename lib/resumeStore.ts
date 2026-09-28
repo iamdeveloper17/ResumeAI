@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 // ─── Types ───
 export interface Experience {
-  _id: string;
+  _id?: string;
   company: string;
   position: string;
   location: string;
@@ -13,7 +13,7 @@ export interface Experience {
 }
 
 export interface Education {
-  _id: string;
+  _id?: string;
   institution: string;
   degree: string;
   field: string;
@@ -23,13 +23,13 @@ export interface Education {
 }
 
 export interface Skill {
-  _id: string;
+  _id?: string;
   category: string;
   items: string[];
 }
 
 export interface Project {
-  _id: string;
+  _id?: string;
   name: string;
   description: string;
   techStack: string[];
@@ -37,7 +37,7 @@ export interface Project {
 }
 
 export interface Certification {
-  _id: string;
+  _id?: string;
   name: string;
   issuer: string;
   date: string;
@@ -67,18 +67,19 @@ export interface ResumeData {
 }
 
 interface ResumeStore {
+  resumeId: string | null;
   data: ResumeData;
   currentStep: number;
   isSaving: boolean;
   lastSaved: Date | null;
 
+  setResumeId: (id: string | null) => void;
   setData: (data: Partial<ResumeData>) => void;
   setPersonal: (personal: Partial<ResumeData["personal"]>) => void;
   setStep: (step: number) => void;
   setIsSaving: (isSaving: boolean) => void;
-  setLastSaved: (date: Date) => void;
+  setLastSaved: (date: Date | null) => void;
 
-  // Experience
   addExperience: () => void;
   updateExperience: (id: string, data: Partial<Experience>) => void;
   removeExperience: (id: string) => void;
@@ -86,23 +87,19 @@ interface ResumeStore {
   updateBullet: (expId: string, index: number, value: string) => void;
   removeBullet: (expId: string, index: number) => void;
 
-  // Education
   addEducation: () => void;
   updateEducation: (id: string, data: Partial<Education>) => void;
   removeEducation: (id: string) => void;
 
-  // Skills
   addSkill: () => void;
   updateSkill: (id: string, data: Partial<Skill>) => void;
   removeSkill: (id: string) => void;
-  setSkills: (skills: Skill[]) => void; // ← NEW
+  setSkills: (skills: Skill[]) => void;
 
-  // Projects
   addProject: () => void;
   updateProject: (id: string, data: Partial<Project>) => void;
   removeProject: (id: string) => void;
 
-  // Certifications
   addCertification: () => void;
   updateCertification: (id: string, data: Partial<Certification>) => void;
   removeCertification: (id: string) => void;
@@ -113,7 +110,7 @@ interface ResumeStore {
 const uid = () => Math.random().toString(36).substring(2, 10);
 
 export const emptyResume: ResumeData = {
-  title: "My Resume",
+  title: "Untitled Resume",
   template: "modern",
   accentColor: "#2563eb",
   personal: {
@@ -134,6 +131,31 @@ export const emptyResume: ResumeData = {
   certifications: [],
 };
 
+// ✅ NEW: Helper to clean data before saving
+export const cleanDataForSave = (data: ResumeData) => {
+  return {
+    title: data.title,
+    template: data.template,
+    accentColor: data.accentColor,
+    personal: data.personal,
+    experience: (data.experience || []).map(
+      ({ _id, ...rest }) => rest
+    ),
+    education: (data.education || []).map(
+      ({ _id, ...rest }) => rest
+    ),
+    skills: (data.skills || []).map(
+      ({ _id, ...rest }) => rest
+    ),
+    projects: (data.projects || []).map(
+      ({ _id, ...rest }) => rest
+    ),
+    certifications: (data.certifications || []).map(
+      ({ _id, ...rest }) => rest
+    ),
+  };
+};
+
 // ─── Step Validation ───
 export interface ValidationError {
   field: string;
@@ -147,7 +169,7 @@ export function validateStep(
   const errors: ValidationError[] = [];
 
   switch (step) {
-    case 0: // Personal
+    case 0:
       if (!data.personal.fullName.trim())
         errors.push({ field: "fullName", message: "Full name is required" });
       if (!data.personal.jobTitle.trim())
@@ -158,7 +180,7 @@ export function validateStep(
         errors.push({ field: "email", message: "Invalid email format" });
       break;
 
-    case 1: // Experience
+    case 1:
       data.experience.forEach((exp, i) => {
         if (!exp.company.trim())
           errors.push({
@@ -173,7 +195,7 @@ export function validateStep(
       });
       break;
 
-    case 2: // Education
+    case 2:
       data.education.forEach((edu, i) => {
         if (!edu.institution.trim())
           errors.push({
@@ -188,7 +210,7 @@ export function validateStep(
       });
       break;
 
-    case 3: // Skills
+    case 3:
       data.skills.forEach((skill, i) => {
         if (!skill.category.trim())
           errors.push({
@@ -198,11 +220,7 @@ export function validateStep(
       });
       break;
 
-    case 4: // Projects
-      // Optional
-      break;
-
-    default:
+    case 4:
       break;
   }
 
@@ -211,10 +229,13 @@ export function validateStep(
 
 // ─── Store ───
 export const useResumeStore = create<ResumeStore>((set) => ({
+  resumeId: null,
   data: emptyResume,
   currentStep: 0,
   isSaving: false,
   lastSaved: null,
+
+  setResumeId: (id) => set({ resumeId: id }),
 
   setData: (data) => set((state) => ({ data: { ...state.data, ...data } })),
 
@@ -374,7 +395,6 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  // ✅ NEW: setSkills — for AI skill suggestion
   setSkills: (skills) =>
     set((state) => ({
       data: { ...state.data, skills },
@@ -450,6 +470,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
 
   reset: () =>
     set({
+      resumeId: null,
       data: emptyResume,
       currentStep: 0,
       isSaving: false,

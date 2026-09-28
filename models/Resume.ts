@@ -1,55 +1,12 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface IExperience {
-  _id: mongoose.Types.ObjectId;
-  company: string;
-  position: string;
-  location: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
-  bullets: string[];
-}
-
-export interface IEducation {
-  _id: mongoose.Types.ObjectId;
-  institution: string;
-  degree: string;
-  field: string;
-  startDate: string;
-  endDate: string;
-  grade: string;
-}
-
-export interface ISkill {
-  _id: mongoose.Types.ObjectId;
-  category: string;
-  items: string[];
-}
-
-export interface IProject {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  description: string;
-  techStack: string[];
-  link: string;
-}
-
-export interface ICertification {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  issuer: string;
-  date: string;
-  link: string;
-}
-
 export interface IResume extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   title: string;
   slug: string;
   isPublic: boolean;
-  template: "modern" | "classic" | "minimal" | "creative";
+  template: "modern" | "classic";
   accentColor: string;
 
   personal: {
@@ -62,15 +19,50 @@ export interface IResume extends Document {
     linkedin: string;
     github: string;
     summary: string;
-    photo: string;
   };
 
-  experience: IExperience[];
-  education: IEducation[];
-  skills: ISkill[];
-  projects: IProject[];
-  certifications: ICertification[];
-  languages: { _id: mongoose.Types.ObjectId; name: string; proficiency: string }[];
+  experience: Array<{
+    company: string;
+    position: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    current: boolean;
+    bullets: string[];
+  }>;
+
+  education: Array<{
+    institution: string;
+    degree: string;
+    field: string;
+    startDate: string;
+    endDate: string;
+    grade: string;
+  }>;
+
+  skills: Array<{
+    category: string;
+    items: string[];
+  }>;
+
+  projects: Array<{
+    name: string;
+    description: string;
+    techStack: string[];
+    link: string;
+  }>;
+
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    date: string;
+    link: string;
+  }>;
+
+  languages: Array<{
+    name: string;
+    proficiency: string;
+  }>;
 
   viewCount: number;
   createdAt: Date;
@@ -103,12 +95,12 @@ const ResumeSchema = new Schema<IResume>(
     },
     template: {
       type: String,
-      enum: ["modern", "classic", "minimal", "creative"],
+      enum: ["modern", "classic"],
       default: "modern",
     },
     accentColor: {
       type: String,
-      default: "#3465ff",
+      default: "#2563eb",
     },
     personal: {
       fullName: { type: String, default: "" },
@@ -120,10 +112,10 @@ const ResumeSchema = new Schema<IResume>(
       linkedin: { type: String, default: "" },
       github: { type: String, default: "" },
       summary: { type: String, default: "" },
-      photo: { type: String, default: "" },
     },
     experience: [
       {
+        _id: false, // ✅ No sub-document ObjectId
         company: { type: String, default: "" },
         position: { type: String, default: "" },
         location: { type: String, default: "" },
@@ -135,6 +127,7 @@ const ResumeSchema = new Schema<IResume>(
     ],
     education: [
       {
+        _id: false, // ✅ No sub-document ObjectId
         institution: { type: String, default: "" },
         degree: { type: String, default: "" },
         field: { type: String, default: "" },
@@ -145,12 +138,14 @@ const ResumeSchema = new Schema<IResume>(
     ],
     skills: [
       {
+        _id: false, // ✅ No sub-document ObjectId
         category: { type: String, default: "" },
         items: { type: [String], default: [""] },
       },
     ],
     projects: [
       {
+        _id: false, // ✅ No sub-document ObjectId
         name: { type: String, default: "" },
         description: { type: String, default: "" },
         techStack: { type: [String], default: [""] },
@@ -159,6 +154,7 @@ const ResumeSchema = new Schema<IResume>(
     ],
     certifications: [
       {
+        _id: false, // ✅ No sub-document ObjectId
         name: { type: String, default: "" },
         issuer: { type: String, default: "" },
         date: { type: String, default: "" },
@@ -167,6 +163,7 @@ const ResumeSchema = new Schema<IResume>(
     ],
     languages: [
       {
+        _id: false, // ✅ No sub-document ObjectId
         name: { type: String, default: "" },
         proficiency: { type: String, default: "Fluent" },
       },

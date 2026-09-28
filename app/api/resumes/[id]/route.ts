@@ -3,21 +3,24 @@ import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import Resume from "@/models/Resume";
 import { z } from "zod";
+import { generateSlug } from "@/lib/utils";
 
-const updateSchema = z.object({
-  title: z.string().optional(),
-  template: z.string().optional(),
-  accentColor: z.string().optional(),
-  personal: z.any().optional(),
-  experience: z.any().optional(),
-  education: z.any().optional(),
-  skills: z.any().optional(),
-  projects: z.any().optional(),
-  certifications: z.any().optional(),
-  languages: z.any().optional(),
-}).passthrough();   // ← YE IMPORTANT HAI
+const updateSchema = z
+  .object({
+    title: z.string().optional(),
+    template: z.string().optional(),
+    accentColor: z.string().optional(),
+    personal: z.any().optional(),
+    experience: z.any().optional(),
+    education: z.any().optional(),
+    skills: z.any().optional(),
+    projects: z.any().optional(),
+    certifications: z.any().optional(),
+    languages: z.any().optional(),
+  })
+  .passthrough();
 
-// GET - Load resume
+// GET single resume
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -41,16 +44,16 @@ export async function GET(
     }
 
     return NextResponse.json({ resume });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Get resume error:", error);
     return NextResponse.json(
-      { error: "Failed to load resume" },
+      { error: error.message || "Failed to load resume" },
       { status: 500 }
     );
   }
 }
 
-// PATCH - Save resume
+// PATCH update resume
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -70,7 +73,7 @@ export async function PATCH(
     const resume = await Resume.findOneAndUpdate(
       { _id: id, userId: session.user.id },
       { $set: validated },
-      { new: true }
+      { new: true, returnDocument: "after" }
     );
 
     if (!resume) {
@@ -80,6 +83,14 @@ export async function PATCH(
     return NextResponse.json({ resume, message: "Saved successfully" });
   } catch (error: any) {
     console.error("Update resume error:", error);
+
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.issues },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: error.message || "Failed to save resume" },
       { status: 500 }
@@ -87,7 +98,7 @@ export async function PATCH(
   }
 }
 
-// DELETE - Delete resume
+// DELETE resume
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -111,10 +122,10 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: "Deleted successfully" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Delete resume error:", error);
     return NextResponse.json(
-      { error: "Failed to delete resume" },
+      { error: error.message || "Failed to delete resume" },
       { status: 500 }
     );
   }
