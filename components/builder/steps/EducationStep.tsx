@@ -7,7 +7,7 @@ import {
   DEGREE_SUGGESTIONS,
   FIELD_SUGGESTIONS,
   INSTITUTION_SUGGESTIONS,
-} from "@/lib/suggestions";
+} from "@/lib/data/suggestions-db";
 
 interface EducationStepProps {
   errors?: Record<string, string>;
@@ -42,7 +42,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
               Education {index + 1}
             </span>
             <button
-              onClick={() => removeEducation(edu._id)}
+              onClick={() => removeEducation(edu._id!)}
               className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
             >
               <Trash2 className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
               <AutocompleteInput
                 value={edu.institution}
                 onChange={(value) =>
-                  updateEducation(edu._id, { institution: value })
+                  updateEducation(edu._id!, { institution: value })
                 }
                 suggestions={INSTITUTION_SUGGESTIONS}
                 placeholder="Delhi University"
@@ -71,7 +71,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
               <AutocompleteInput
                 value={edu.degree}
                 onChange={(value) =>
-                  updateEducation(edu._id, { degree: value })
+                  updateEducation(edu._id!, { degree: value })
                 }
                 suggestions={DEGREE_SUGGESTIONS}
                 placeholder="B.Tech"
@@ -88,7 +88,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
               <AutocompleteInput
                 value={edu.field}
                 onChange={(value) =>
-                  updateEducation(edu._id, { field: value })
+                  updateEducation(edu._id!, { field: value })
                 }
                 suggestions={FIELD_SUGGESTIONS}
                 placeholder="Computer Science"
@@ -103,7 +103,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
                 placeholder="8.5 CGPA"
                 value={edu.grade}
                 onChange={(e) =>
-                  updateEducation(edu._id, { grade: e.target.value })
+                  updateEducation(edu._id!, { grade: e.target.value })
                 }
               />
             </div>
@@ -119,7 +119,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                 value={edu.startDate}
                 onChange={(e) =>
-                  updateEducation(edu._id, { startDate: e.target.value })
+                  updateEducation(edu._id!, { startDate: e.target.value })
                 }
               />
             </div>
@@ -132,7 +132,7 @@ export default function EducationStep({ errors = {} }: EducationStepProps) {
                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                 value={edu.endDate}
                 onChange={(e) =>
-                  updateEducation(edu._id, { endDate: e.target.value })
+                  updateEducation(edu._id!, { endDate: e.target.value })
                 }
               />
             </div>

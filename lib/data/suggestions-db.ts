@@ -203,3 +203,11 @@ export function fuzzySearch(query: string, items: string[], max = 8): string[] {
 
   return [...prefix, ...wordBoundary, ...contains, ...fuzzy].slice(0, max);
 }
+
+// ✅ Aliases for backward compatibility
+export const DEGREE_SUGGESTIONS = DEGREES;
+export const FIELD_SUGGESTIONS = FIELDS;
+export const INSTITUTION_SUGGESTIONS = INSTITUTIONS;
+export const SKILL_SUGGESTIONS = SKILLS;
+export const COMPANY_SUGGESTIONS = COMPANIES;
+export const JOB_TITLE_SUGGESTIONS = JOB_TITLES;

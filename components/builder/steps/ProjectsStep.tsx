@@ -39,7 +39,7 @@ export default function ProjectsStep({ errors = {} }: ProjectsStepProps) {
               Project {index + 1}
             </span>
             <button
-              onClick={() => removeProject(project._id)}
+              onClick={() => removeProject(project._id!)}
               className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
             >
               <Trash2 className="w-4 h-4" />
@@ -56,7 +56,7 @@ export default function ProjectsStep({ errors = {} }: ProjectsStepProps) {
                 placeholder="E-commerce App"
                 value={project.name}
                 onChange={(e) =>
-                  updateProject(project._id, { name: e.target.value })
+                  updateProject(project._id!, { name: e.target.value })
                 }
               />
             </div>
@@ -71,7 +71,7 @@ export default function ProjectsStep({ errors = {} }: ProjectsStepProps) {
                 placeholder="A full-stack e-commerce platform with payment integration..."
                 value={project.description}
                 onChange={(e) =>
-                  updateProject(project._id, { description: e.target.value })
+                  updateProject(project._id!, { description: e.target.value })
                 }
               />
             </div>
@@ -83,7 +83,7 @@ export default function ProjectsStep({ errors = {} }: ProjectsStepProps) {
               <SkillsInput
                 skills={project.techStack.filter(Boolean)}
                 onChange={(techStack) =>
-                  updateProject(project._id, { techStack })
+                  updateProject(project._id!, { techStack })
                 }
                 placeholder="e.g., React, Node.js, MongoDB..."
               />
@@ -98,7 +98,7 @@ export default function ProjectsStep({ errors = {} }: ProjectsStepProps) {
                 placeholder="github.com/username/project"
                 value={project.link}
                 onChange={(e) =>
-                  updateProject(project._id, { link: e.target.value })
+                  updateProject(project._id!, { link: e.target.value })
                 }
               />
             </div>
