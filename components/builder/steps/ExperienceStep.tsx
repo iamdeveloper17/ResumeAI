@@ -3,11 +3,7 @@
 import { useResumeStore } from "@/lib/resumeStore";
 import { Plus, Trash2, X } from "lucide-react";
 import AutocompleteInput from "@/components/ui/autocomplete-input";
-import {
-  CITIES,
-  JOB_TITLES,
-  COMPANIES,
-} from "@/lib/data/suggestions-db";
+import { CITIES, JOB_TITLES, COMPANIES } from "@/lib/data/suggestions-db";
 
 interface ExperienceStepProps {
   errors?: Record<string, string>;
@@ -66,7 +62,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs font-medium text-slate-600 mb-1">
                 Company *
               </label>
@@ -80,7 +76,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
                 error={errors[`exp-${index}-company`]}
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs font-medium text-slate-600 mb-1">
                 Position *
               </label>
@@ -97,7 +93,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs font-medium text-slate-600 mb-1">
                 Location
               </label>
@@ -110,7 +106,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
                 placeholder="Start typing city..."
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs font-medium text-slate-600 mb-1">
                 Start Date
               </label>
@@ -123,7 +119,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
                 }
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-xs font-medium text-slate-600 mb-1">
                 End Date
               </label>
@@ -160,9 +156,13 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
             </label>
             <div className="space-y-2">
               {exp.bullets.map((bullet, i) => (
-                <div key={i} className="flex gap-2">
+                <div key={i} className="flex gap-2 items-start">
                   <input
-                    className={`${inputClass("")} flex-1`}
+                    style={{
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                    className={`${inputClass("")} flex-1 min-w-0`}
                     placeholder="Built a feature that increased engagement by 30%"
                     value={bullet}
                     onChange={(e) =>
@@ -172,7 +172,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
                   {exp.bullets.length > 1 && (
                     <button
                       onClick={() => removeBullet(exp._id!, i)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg shrink-0"
                     >
                       <X className="w-4 h-4" />
                     </button>

@@ -32,6 +32,13 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
       skills.length > 0 ||
       projects.length > 0;
 
+    // Common wrapping style
+    const wrapStyle: React.CSSProperties = {
+      wordBreak: "break-word",
+      overflowWrap: "anywhere",
+      whiteSpace: "pre-wrap",
+    };
+
     return (
       <div
         ref={ref}
@@ -72,6 +79,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                 letterSpacing: "0.05em",
                 textTransform: "uppercase",
                 lineHeight: 1.2,
+                ...wrapStyle,
               }}
             >
               {personal.fullName || "Your Name"}
@@ -82,6 +90,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                 fontSize: "12px",
                 fontStyle: "italic",
                 marginBottom: "10px",
+                ...wrapStyle,
               }}
             >
               {personal.jobTitle || "Your Job Title"}
@@ -96,12 +105,12 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                 color: "#4b5563",
               }}
             >
-              {personal.email && <span>{personal.email}</span>}
-              {personal.phone && <span>• {personal.phone}</span>}
-              {personal.location && <span>• {personal.location}</span>}
-              {personal.website && <span>• {personal.website}</span>}
-              {personal.linkedin && <span>• {personal.linkedin}</span>}
-              {personal.github && <span>• {personal.github}</span>}
+              {personal.email && <span style={wrapStyle}>{personal.email}</span>}
+              {personal.phone && <span style={wrapStyle}>• {personal.phone}</span>}
+              {personal.location && <span style={wrapStyle}>• {personal.location}</span>}
+              {personal.website && <span style={wrapStyle}>• {personal.website}</span>}
+              {personal.linkedin && <span style={wrapStyle}>• {personal.linkedin}</span>}
+              {personal.github && <span style={wrapStyle}>• {personal.github}</span>}
             </div>
           </div>
 
@@ -172,6 +181,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                   lineHeight: 1.7,
                   textAlign: "justify",
                   fontStyle: "italic",
+                  ...wrapStyle,
                 }}
               >
                 {personal.summary}
@@ -207,12 +217,27 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                         alignItems: "baseline",
                         gap: "8px",
                         marginBottom: "3px",
+                        flexWrap: "wrap",
                       }}
                     >
-                      <h3 style={{ color: "#111827", fontSize: "11px", fontWeight: 700 }}>
+                      <h3
+                        style={{
+                          color: "#111827",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          minWidth: 0,
+                          ...wrapStyle,
+                        }}
+                      >
                         {exp.position || "Position"}
                       </h3>
-                      <span style={{ color: "#6b7280", fontSize: "9px", flexShrink: 0 }}>
+                      <span
+                        style={{
+                          color: "#6b7280",
+                          fontSize: "9px",
+                          flexShrink: 0,
+                        }}
+                      >
                         {formatDate(exp.startDate)} – {exp.current ? "Present" : formatDate(exp.endDate)}
                       </span>
                     </div>
@@ -222,6 +247,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                         fontSize: "10px",
                         fontStyle: "italic",
                         marginBottom: "4px",
+                        ...wrapStyle,
                       }}
                     >
                       {exp.company}
@@ -239,7 +265,13 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                         }}
                       >
                         {exp.bullets.filter(Boolean).map((b, i) => (
-                          <li key={i} style={{ marginBottom: "3px" }}>
+                          <li
+                            key={i}
+                            style={{
+                              marginBottom: "3px",
+                              ...wrapStyle,
+                            }}
+                          >
                             {b}
                           </li>
                         ))}
@@ -278,16 +310,38 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                         justifyContent: "space-between",
                         alignItems: "baseline",
                         gap: "8px",
+                        flexWrap: "wrap",
                       }}
                     >
-                      <h3 style={{ color: "#111827", fontSize: "10.5px", fontWeight: 700 }}>
+                      <h3
+                        style={{
+                          color: "#111827",
+                          fontSize: "10.5px",
+                          fontWeight: 700,
+                          minWidth: 0,
+                          ...wrapStyle,
+                        }}
+                      >
                         {edu.degree || "Degree"} {edu.field && `in ${edu.field}`}
                       </h3>
-                      <span style={{ color: "#6b7280", fontSize: "9px", flexShrink: 0 }}>
+                      <span
+                        style={{
+                          color: "#6b7280",
+                          fontSize: "9px",
+                          flexShrink: 0,
+                        }}
+                      >
                         {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
                       </span>
                     </div>
-                    <p style={{ color: "#4b5563", fontSize: "10px", fontStyle: "italic" }}>
+                    <p
+                      style={{
+                        color: "#4b5563",
+                        fontSize: "10px",
+                        fontStyle: "italic",
+                        ...wrapStyle,
+                      }}
+                    >
                       {edu.institution}
                       {edu.grade && ` · ${edu.grade}`}
                     </p>
@@ -325,12 +379,20 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                           fontSize: "10px",
                           fontWeight: 700,
                           marginBottom: "2px",
+                          ...wrapStyle,
                         }}
                       >
                         {skill.category}:
                       </p>
                     )}
-                    <p style={{ color: "#374151", fontSize: "9.5px", lineHeight: 1.6 }}>
+                    <p
+                      style={{
+                        color: "#374151",
+                        fontSize: "9.5px",
+                        lineHeight: 1.6,
+                        ...wrapStyle,
+                      }}
+                    >
                       {skill.items.filter(Boolean).join(", ")}
                     </p>
                   </div>
@@ -366,19 +428,43 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                         justifyContent: "space-between",
                         alignItems: "baseline",
                         gap: "8px",
+                        flexWrap: "wrap",
                       }}
                     >
-                      <h3 style={{ color: "#111827", fontSize: "10.5px", fontWeight: 700 }}>
+                      <h3
+                        style={{
+                          color: "#111827",
+                          fontSize: "10.5px",
+                          fontWeight: 700,
+                          minWidth: 0,
+                          ...wrapStyle,
+                        }}
+                      >
                         {p.name || "Project Name"}
                       </h3>
                       {p.link && (
-                        <span style={{ color: "#6b7280", fontSize: "9px", flexShrink: 0 }}>
+                        <span
+                          style={{
+                            color: "#6b7280",
+                            fontSize: "9px",
+                            flexShrink: 0,
+                            ...wrapStyle,
+                          }}
+                        >
                           {p.link}
                         </span>
                       )}
                     </div>
                     {p.description && (
-                      <p style={{ color: "#374151", fontSize: "9.5px", marginTop: "3px", lineHeight: 1.6 }}>
+                      <p
+                        style={{
+                          color: "#374151",
+                          fontSize: "9.5px",
+                          marginTop: "3px",
+                          lineHeight: 1.6,
+                          ...wrapStyle,
+                        }}
+                      >
                         {p.description}
                       </p>
                     )}
@@ -389,6 +475,7 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
                           fontSize: "9px",
                           fontStyle: "italic",
                           marginTop: "2px",
+                          ...wrapStyle,
                         }}
                       >
                         Technologies: {p.techStack.filter(Boolean).join(", ")}

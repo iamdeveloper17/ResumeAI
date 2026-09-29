@@ -67,6 +67,11 @@ export default function ProjectsStep({ errors = {} }: ProjectsStepProps) {
               </label>
               <textarea
                 rows={3}
+                style={{
+                  wordBreak: "break-word",
+                  overflowWrap: "anywhere",
+                  whiteSpace: "pre-wrap",
+                }}
                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                 placeholder="A full-stack e-commerce platform with payment integration..."
                 value={project.description}
