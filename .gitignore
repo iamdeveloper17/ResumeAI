@@ -9,11 +9,10 @@ coverage/
 # Next.js
 .next/
 out/
-build/
 dist/
 
-# Production
-/build
+# Production (Next.js uses .next/ not build/)
+# Don't ignore build/ — it's used in app/(dashboard)/build/
 
 # Misc
 .DS_Store
