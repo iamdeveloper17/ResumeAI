@@ -6,7 +6,7 @@ import User from "@/models/User";
 import { loginSchema } from "./validations";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET,        // ← YE ADD HUA
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
@@ -59,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+      if (user && user.id) {          // ← YE CHANGE HUA
         token.id = user.id;
       }
       return token;
