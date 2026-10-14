@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import Resume from "@/models/Resume";
@@ -20,7 +21,21 @@ const updateSchema = z
   })
   .passthrough();
 
-// GET single resume
+// ─── Helper: Validate ObjectId ───
+function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id) && id.length === 24;
+}
+
+// ─── Helper: Generic error response ───
+function serverError(context: string, error: unknown) {
+  console.error(`[${context}]`, error);
+  return NextResponse.json(
+    { error: "Something went wrong. Please try again." },
+    { status: 500 }
+  );
+}
+
+// ─── GET single resume ───
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -32,6 +47,15 @@ export async function GET(
     }
 
     const { id } = await params;
+
+    // ✅ Validate ObjectId format
+    if (!isValidObjectId(id)) {
+      return NextResponse.json(
+        { error: "Invalid resume ID" },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
 
     const resume = await Resume.findOne({
@@ -44,16 +68,12 @@ export async function GET(
     }
 
     return NextResponse.json({ resume });
-  } catch (error: any) {
-    console.error("Get resume error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to load resume" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return serverError("GET /api/resumes/[id]", error);
   }
 }
 
-// PATCH update resume
+// ─── PATCH update resume ───
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -65,8 +85,30 @@ export async function PATCH(
     }
 
     const { id } = await params;
+
+    // ✅ Validate ObjectId format
+    if (!isValidObjectId(id)) {
+      return NextResponse.json(
+        { error: "Invalid resume ID" },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
-    const validated = updateSchema.parse(body);
+
+    // ✅ Validate body
+    let validated;
+    try {
+      validated = updateSchema.parse(body);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: "Validation failed", details: err.issues },
+          { status: 400 }
+        );
+      }
+      throw err;
+    }
 
     await connectDB();
 
@@ -81,24 +123,12 @@ export async function PATCH(
     }
 
     return NextResponse.json({ resume, message: "Saved successfully" });
-  } catch (error: any) {
-    console.error("Update resume error:", error);
-
-    if (error.name === "ZodError") {
-      return NextResponse.json(
-        { error: "Validation failed", details: error.issues },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: error.message || "Failed to save resume" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return serverError("PATCH /api/resumes/[id]", error);
   }
 }
 
-// DELETE resume
+// ─── DELETE resume ───
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -110,6 +140,15 @@ export async function DELETE(
     }
 
     const { id } = await params;
+
+    // ✅ Validate ObjectId format
+    if (!isValidObjectId(id)) {
+      return NextResponse.json(
+        { error: "Invalid resume ID" },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
 
     const result = await Resume.findOneAndDelete({
@@ -122,11 +161,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: "Deleted successfully" });
-  } catch (error: any) {
-    console.error("Delete resume error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to delete resume" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return serverError("DELETE /api/resumes/[id]", error);
   }
 }
