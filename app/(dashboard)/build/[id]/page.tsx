@@ -17,6 +17,7 @@ import SkillsStep from "@/components/builder/steps/SkillsStep";
 import ProjectsStep from "@/components/builder/steps/ProjectsStep";
 import TemplateRenderer from "@/components/builder/templates/TemplateRenderer";
 import PreviewControls from "@/components/builder/PreviewControls";
+import { ATSScorePanel } from "@/components/builder/ATSScorePanel";
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,6 +25,7 @@ import {
   AlertCircle,
   Printer,
   Loader2,
+  Target,
 } from "lucide-react";
 
 const STEPS = [
@@ -74,7 +76,6 @@ export default function BuilderPage({ params }: PageProps) {
   // ─── Load resume ───
   useEffect(() => {
     const loadResume = async () => {
-      // ✅ Case 1: New resume — blank form
       if (id === "new") {
         setResumeId(null);
         setData(emptyResume);
@@ -83,13 +84,11 @@ export default function BuilderPage({ params }: PageProps) {
         return;
       }
 
-      // ✅ Case 2: Same resume already loaded
       if (resumeId === id) {
         setIsLoading(false);
         return;
       }
 
-      // ✅ Case 3: Load from DB
       try {
         const res = await fetch(`/api/resumes/${id}`);
         if (!res.ok) throw new Error("Failed to load");
@@ -144,12 +143,10 @@ export default function BuilderPage({ params }: PageProps) {
   const handleManualSave = async () => {
     setIsSavingLocal(true);
     try {
-      // Clean data first (remove _id from sub-arrays)
       const cleaned = cleanDataForSave(data);
       let savedResumeId = resumeId;
 
       if (!resumeId && id === "new") {
-        // ✅ Step 1: Create new resume
         const createRes = await fetch("/api/resumes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -163,7 +160,6 @@ export default function BuilderPage({ params }: PageProps) {
         const { resume: newResume } = await createRes.json();
         savedResumeId = newResume._id;
 
-        // ✅ Step 2: Save full data via PATCH
         const saveRes = await fetch(`/api/resumes/${savedResumeId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -172,11 +168,9 @@ export default function BuilderPage({ params }: PageProps) {
 
         if (!saveRes.ok) throw new Error("Failed to save data");
 
-        // Update state + URL
         setResumeId(savedResumeId);
         window.history.replaceState(null, "", `/build/${savedResumeId}`);
       } else {
-        // ✅ Already exists — UPDATE
         const currentId = resumeId || id;
         const res = await fetch(`/api/resumes/${currentId}`, {
           method: "PATCH",
@@ -447,8 +441,9 @@ export default function BuilderPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* RIGHT: Live Preview */}
-        <div className="w-full">
+        {/* RIGHT: Live Preview + ATS Score */}
+        <div className="w-full space-y-6">
+          {/* Live Preview */}
           <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 lg:sticky lg:top-20">
             <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
               <h2 className="text-lg font-bold text-slate-900">
@@ -474,6 +469,26 @@ export default function BuilderPage({ params }: PageProps) {
               >
                 <TemplateRenderer ref={previewRef} data={data} />
               </div>
+            </div>
+          </div>
+
+          {/* ✅ ATS Score Checker */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Target className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">
+                  ATS Score Checker
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Check how well your resume passes Applicant Tracking Systems
+                </p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <ATSScorePanel resumeData={data} />
             </div>
           </div>
         </div>
