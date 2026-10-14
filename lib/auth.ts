@@ -6,6 +6,7 @@ import User from "@/models/User";
 import { loginSchema } from "./validations";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,        // ← YE ADD HUA
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
