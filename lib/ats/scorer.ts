@@ -12,6 +12,7 @@ import {
   checkSkills,
   checkSummary,
   checkProjects,
+  checkFormatting,
 } from "./rules";
 
 const WEIGHTS = {
@@ -75,6 +76,7 @@ export function calculateATSScore(resume: ResumeData): ATSResult {
   const educationIssues = checkEducation(resume);
   const skillsIssues = checkSkills(resume);
   const contentIssues = [...checkSummary(resume), ...checkProjects(resume)];
+  const formattingIssues = checkFormatting(resume);
 
   const categories: ATSCategoryScore[] = [
     {
@@ -115,6 +117,12 @@ export function calculateATSScore(resume: ResumeData): ATSResult {
       score: calculateCategoryScore("content", contentIssues, WEIGHTS.content),
       issues: contentIssues,
     },
+    {
+      name: "Formatting",
+      maxScore: 10,
+      score: calculateCategoryScore("formatting", formattingIssues, 10),
+      issues: formattingIssues,
+    },
   ];
 
   const overallScore = Math.round(
@@ -123,7 +131,7 @@ export function calculateATSScore(resume: ResumeData): ATSResult {
 
   const allIssues = categories.flatMap((cat) => cat.issues);
 
-  return {
+    return {
     overallScore,
     grade: getGrade(overallScore),
     categories,
@@ -131,5 +139,7 @@ export function calculateATSScore(resume: ResumeData): ATSResult {
     topStrengths: getTopStrengths(categories),
     topSuggestions: getTopSuggestions(allIssues),
     checkedAt: new Date().toISOString(),
+    formattingErrors: formattingIssues.map((issue) => issue.message),
+    missingKeywords: [],
   };
 }

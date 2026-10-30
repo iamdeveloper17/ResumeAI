@@ -24,6 +24,8 @@ export interface ATSResult {
   topSuggestions: string[];
   aiInsights?: string;
   checkedAt: string;
+  missingKeywords?: string[];
+  formattingErrors?: string[];
 }
 
 export interface ResumeData {

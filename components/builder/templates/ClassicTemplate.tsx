@@ -49,7 +49,8 @@ const ClassicTemplate = forwardRef<HTMLDivElement, ClassicTemplateProps>(
           borderRadius: "12px",
           overflow: "hidden",
           aspectRatio: "8.5 / 11",
-          fontFamily: "Georgia, 'Times New Roman', serif",
+           fontFamily: data.fontFamily || "serif", 
+          fontSize: data.fontSize || "11px",
           color: "#1f2937",
         }}
       >

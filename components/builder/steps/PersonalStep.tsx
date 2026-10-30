@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useResumeStore } from "@/lib/resumeStore";
 import { JOB_TITLES, CITIES } from "@/lib/data/suggestions-db";
 import AutocompleteInput from "@/components/ui/autocomplete-input";
+import { Sparkles, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PersonalStepProps {
   errors?: Record<string, string>;
@@ -13,6 +15,7 @@ interface PersonalStepProps {
 export default function PersonalStep({ errors = {} }: PersonalStepProps) {
   const { data, setPersonal } = useResumeStore();
   const p = data.personal;
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const inputClass = (field: string) =>
     `w-full px-3.5 py-2.5 bg-white border rounded-xl text-sm focus:outline-none focus:ring-4 transition-all ${
@@ -20,6 +23,43 @@ export default function PersonalStep({ errors = {} }: PersonalStepProps) {
         ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
         : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10"
     }`;
+
+  // 🚀 AI Summary Generator Logic
+  const handleAISummary = async () => {
+    if (!p.jobTitle) {
+      return toast.error("Please enter a Job Title first so AI can understand your role.");
+    }
+
+    setIsGenerating(true);
+    try {
+      // Skills collect karna AI ko context dene ke liye
+      const allSkills = data.skills.flatMap((s) => s.items).filter(Boolean);
+
+      const res = await fetch("/api/ai/summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: p.fullName,
+          jobTitle: p.jobTitle,
+          experience: p.summary, // Existing draft as context
+          skills: allSkills,
+        }),
+      });
+
+      const result = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to generate summary");
+      }
+
+      setPersonal({ summary: result.summary });
+      toast.success("AI Summary generated successfully! ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -143,10 +183,30 @@ export default function PersonalStep({ errors = {} }: PersonalStepProps) {
         </div>
       </div>
 
+      {/* 🚀 Professional Summary Section 🚀 */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          Professional Summary
-        </label>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-sm font-medium text-slate-700">
+            Professional Summary
+          </label>
+          
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAISummary}
+            disabled={isGenerating}
+            className="h-7 px-2.5 text-xs text-purple-700 bg-purple-50 border-purple-200 hover:bg-purple-100 hover:text-purple-800 transition-all gap-1.5 shadow-sm"
+          >
+            {isGenerating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5" />
+            )}
+            {isGenerating ? "Generating..." : "Write with AI"}
+          </Button>
+        </div>
+
         <textarea
           rows={4}
           style={{
@@ -159,9 +219,9 @@ export default function PersonalStep({ errors = {} }: PersonalStepProps) {
           value={p.summary}
           onChange={(e) => setPersonal({ summary: e.target.value })}
         />
-        <p className="text-xs text-slate-400 mt-1.5">
-          💡 Tip: Mention your years of experience, key skills, and what makes
-          you unique.
+        <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
+          💡 Tip: Write a rough draft or fill Job Title, then click{" "}
+          <strong className="text-purple-600 font-medium">Write with AI</strong>.
         </p>
       </div>
     </div>

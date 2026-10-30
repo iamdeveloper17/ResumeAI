@@ -26,7 +26,13 @@ import {
   Printer,
   Loader2,
   Target,
+  Eye
 } from "lucide-react";
+import { AIToolsPanel } from "@/components/builder/AIToolsPanel"; 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PreviewModal } from "@/components/builder/PreviewModal";
+import { Button } from "@/components/ui/button";
+import { InterviewModal } from "@/components/builder/InterviewModal";
 
 const STEPS = [
   "Personal Info",
@@ -72,6 +78,8 @@ export default function BuilderPage({ params }: PageProps) {
   const CurrentStepComponent = STEPS_COMPONENTS[currentStep];
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === STEPS.length - 1;
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isInterviewOpen, setIsInterviewOpen] = useState(false);
 
   // ─── Load resume ───
   useEffect(() => {
@@ -355,6 +363,19 @@ export default function BuilderPage({ params }: PageProps) {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {/* 🚀 AI Mock Interview Button 🚀 */}
+          <Button
+            onClick={() => setIsInterviewOpen(true)}
+            variant="outline"
+            className="border-purple-200 text-purple-700 hover:bg-purple-50 gap-2 h-10 px-4 rounded-xl"
+          >
+            <Target className="w-4 h-4" />
+            <span className="hidden sm:inline">Mock Interview</span>
+          </Button>
+
+          {/* 🚀 Naya AI Button Header me 🚀 */}
+          <AIToolsPanel />
+          
           <button
             onClick={handlePrint}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30"
@@ -366,7 +387,7 @@ export default function BuilderPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Main grid */}
+      {/* Main Grid - 2 Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: Form */}
         <div className="w-full">
@@ -391,7 +412,7 @@ export default function BuilderPage({ params }: PageProps) {
               </div>
             )}
 
-            <div className="min-h-[400px]">
+            <div className="min-h-100">
               <CurrentStepComponent errors={errors} />
             </div>
 
@@ -441,58 +462,46 @@ export default function BuilderPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* RIGHT: Live Preview + ATS Score */}
-        <div className="w-full space-y-6">
-          {/* Live Preview */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 lg:sticky lg:top-20">
-            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-              <h2 className="text-lg font-bold text-slate-900">
-                Live Preview
-              </h2>
-              <PreviewControls
-                template={data.template}
-                accentColor={data.accentColor}
-                zoom={zoom}
-                onTemplateChange={(template) => setData({ template })}
-                onColorChange={(accentColor) => setData({ accentColor })}
-                onZoomChange={setZoom}
-              />
+              {/* RIGHT: Preview Action Card */}
+        <div className="w-full lg:sticky lg:top-20 h-fit">
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col items-center justify-center text-center space-y-6 min-h-[400px]">
+            
+            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center">
+              <Eye className="w-10 h-10 text-blue-600" />
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Resume Preview</h2>
+              <p className="text-slate-500 text-sm max-w-sm">
+                Click the button below to view your resume in full screen. You can zoom, change templates, and download the PDF.
+              </p>
             </div>
 
-            <div className="overflow-hidden">
-              <div
-                style={{
-                  transform: `scale(${zoom / 100})`,
-                  transformOrigin: "top left",
-                  transition: "transform 0.2s ease-out",
-                }}
-              >
-                <TemplateRenderer ref={previewRef} data={data} />
-              </div>
-            </div>
-          </div>
-
-          {/* ✅ ATS Score Checker */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Target className="w-4 h-4 text-blue-600" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  ATS Score Checker
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Check how well your resume passes Applicant Tracking Systems
-                </p>
-              </div>
-            </div>
-            <div className="mt-4">
-              <ATSScorePanel resumeData={data} />
-            </div>
+            <Button 
+              onClick={() => setIsPreviewOpen(true)}
+              className="w-full max-w-xs h-12 text-base bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/30 gap-2"
+            >
+              <Eye className="w-5 h-5" /> View Full Preview
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* 🚀 Yahan Preview Modal Render hoga 🚀 */}
+      <PreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        data={data}
+        zoom={zoom}
+        setZoom={setZoom}
+        onDownload={handlePrint}
+      />
+
+      {/* 🚀 Naya: Mock Interview Modal 🚀 */}
+      <InterviewModal
+        isOpen={isInterviewOpen}
+        onClose={() => setIsInterviewOpen(false)}
+      />
     </div>
   );
 }

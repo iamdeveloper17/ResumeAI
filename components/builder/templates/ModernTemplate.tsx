@@ -32,21 +32,31 @@ const ModernTemplate = forwardRef<HTMLDivElement, ModernTemplateProps>(
       skills.length > 0 ||
       projects.length > 0;
 
+      const bgStyle = {
+      none: { backgroundColor: "#ffffff" },
+      dots: { backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)", backgroundSize: "10px 10px" },
+      grid: { backgroundImage: "linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)", backgroundSize: "20px 20px" },
+      gradient: { background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)" },
+      lines: { backgroundImage: "repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 10px, #fff 10px, #fff 20px)" },
+      pastel: { background: "linear-gradient(to right, #fdf4ff, #f4f4f5)" },
+    }[data.backgroundPattern || "none"];
+
     return (
       <div
         ref={ref}
         id="resume-preview"
         style={{
-          backgroundColor: "#ffffff",
+          // backgroundColor: "#ffffff",
           border: "1px solid #e2e8f0",
           borderRadius: "12px",
           overflow: "hidden",
           aspectRatio: "8.5 / 11",
-          fontFamily:
-            "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          // 👇 YAHAN ADD KARO 👇
+          fontFamily: data.fontFamily || "sans-serif", 
+          fontSize: data.fontSize || "11px",
+          // 👆 YAHAN TAK 👆
           color: "#1e293b",
-          wordBreak: "break-word",
-          overflowWrap: "anywhere",
+          ...bgStyle,
         }}
       >
         <div
@@ -68,7 +78,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, ModernTemplateProps>(
             <h1
               style={{
                 color: accent,
-                fontSize: "22px",
+                fontSize: "2em",
                 fontWeight: 700,
                 marginBottom: "4px",
                 letterSpacing: "-0.02em",
@@ -82,7 +92,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, ModernTemplateProps>(
             <p
               style={{
                 color: "#475569",
-                fontSize: "12px",
+                fontSize: "1.2em",
                 fontWeight: 500,
                 marginBottom: "8px",
                 wordBreak: "break-word",
@@ -209,7 +219,7 @@ const ModernTemplate = forwardRef<HTMLDivElement, ModernTemplateProps>(
               <p
                 style={{
                   color: "#334155",
-                  fontSize: "9.5px",
+                  fontSize: "0.9em",
                   lineHeight: 1.6,
                   wordBreak: "break-word",
                   overflowWrap: "anywhere",

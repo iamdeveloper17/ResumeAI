@@ -8,6 +8,9 @@ export interface IResume extends Document {
   isPublic: boolean;
   template: "modern" | "classic";
   accentColor: string;
+    jobDescription?: string;
+  coverLetter?: string;
+  versionName?: string;
 
   personal: {
     fullName: string;
@@ -93,11 +96,11 @@ const ResumeSchema = new Schema<IResume>(
       type: Boolean,
       default: false,
     },
-    template: {
-      type: String,
-      enum: ["modern", "classic"],
-      default: "modern",
-    },
+template: {
+  type: String,
+  enum: ["modern", "classic", "minimal", "executive", "creative"],
+  default: "modern",
+},
     accentColor: {
       type: String,
       default: "#2563eb",
@@ -172,6 +175,9 @@ const ResumeSchema = new Schema<IResume>(
       type: Number,
       default: 0,
     },
+    jobDescription: { type: String, default: "" },
+    coverLetter: { type: String, default: "" },
+    versionName: { type: String, default: "Master Version" },
   },
   {
     timestamps: true,

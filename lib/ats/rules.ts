@@ -228,7 +228,18 @@ export function checkEducation(resume: ResumeData): ATSIssue[] {
 
 export function checkSkills(resume: ResumeData): ATSIssue[] {
   const issues: ATSIssue[] = [];
-  const skills = (resume.skills || []).filter((s) => s && s.trim());
+  const skills = (resume.skills || []).filter((s: any) => {
+  if (!s) return false;
+  // Agar skill object hai (category aur items ke sath)
+  if (typeof s === "object" && Array.isArray(s.items)) {
+    return s.items.some((item: string) => item && item.trim().length > 0);
+  }
+  // Agar skill direct string hai
+  if (typeof s === "string") {
+    return s.trim().length > 0;
+  }
+  return false;
+});
 
   if (skills.length === 0) {
     issues.push({
@@ -318,6 +329,52 @@ export function checkProjects(resume: ResumeData): ATSIssue[] {
       }
     });
   }
+
+  return issues;
+}
+
+// 🚀 Naya Function: Formatting Errors Checker
+export function checkFormatting(resume: ResumeData): ATSIssue[] {
+  const issues: ATSIssue[] = [];
+
+  // 1. Check if summary is too short
+  if (resume.personal?.summary && resume.personal.summary.length < 50) {
+    issues.push({
+      id: "short-summary",
+      severity: "warning",
+      category: "formatting",
+      message: "Summary is too short",
+      suggestion: "Write at least 2-3 sentences (50+ characters) for a strong summary.",
+    });
+  }
+
+  // 2. Check for very long bullet points
+  resume.experience?.forEach((exp, i) => {
+    exp.bullets?.forEach((bullet, j) => {
+      if (bullet.length > 200) {
+        issues.push({
+          id: `long-bullet-${i}-${j}`,
+          severity: "warning",
+          category: "formatting",
+          message: `Bullet point in experience ${i + 1} is too long`,
+          suggestion: "Keep bullet points concise (under 200 characters) for better readability.",
+        });
+      }
+    });
+  });
+
+  // 3. Check for missing dates
+  resume.experience?.forEach((exp, i) => {
+    if (!exp.startDate || (!exp.endDate && !exp.current)) {
+      issues.push({
+        id: `missing-date-${i}`,
+        severity: "critical",
+        category: "formatting",
+        message: `Experience ${i + 1} is missing dates`,
+        suggestion: "Add start and end dates for every experience.",
+      });
+    }
+  });
 
   return issues;
 }

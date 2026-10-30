@@ -13,23 +13,22 @@ export async function generateSummary(
   experience: string,
   skills: string[]
 ): Promise<string> {
-  const prompt = `You are a professional resume writer. Write a compelling professional summary for a resume.
+  const prompt = `You are an expert resume writer. Write a professional summary for a resume based on these details:
 
-Candidate details:
-- Name: ${fullName || "Professional"}
 - Target Role: ${jobTitle || "Software Developer"}
-- Experience: ${experience || "Fresher / No experience yet"}
+- Draft/Experience: ${experience || "Fresher / No experience yet"}
 - Key Skills: ${skills.length > 0 ? skills.join(", ") : "General technical skills"}
 
-Requirements:
-- Write in FIRST PERSON without using "I" (e.g., "Full Stack Developer with 3+ years...")
-- 2-3 sentences only (40-60 words total)
-- Include: years of experience, key skills, biggest strength, what makes them unique
-- Use strong action words and quantify if possible
-- Professional tone, no fluff
-- DO NOT add prefix like "Summary:" or "Professional Summary:"
+CRITICAL RULES:
+1. Write in FIRST PERSON but DO NOT use the word "I" (e.g., "Full Stack Developer with 2 years of experience building...", NOT "I am a...").
+2. DO NOT use typical AI buzzwords like "Results-driven", "Passionate", "Dynamic", "Synergy". Make it sound human and natural.
+3. Keep it short: Exactly 2 to 3 sentences (max 50 words).
+4. Use the draft provided by the user as the base context (if draft is empty, write based on the Job Title and Skills).
+5. Start with the Job Title.
+6. Output ONLY the summary text, no extra quotes or prefixes.
 
-Output ONLY the summary text, nothing else.`;
+Example of a GOOD output:
+"Software Engineer with 2 years of experience developing scalable web applications using React and Node.js. Skilled in optimizing database queries and building responsive user interfaces, with a strong focus on clean code and seamless user experience."`;
 
   try {
     const interaction = await ai.interactions.create({
@@ -120,5 +119,61 @@ No numbering, no explanations, no bullet points.`;
   } catch (error: any) {
     console.error("Gemini suggestSkills error:", error.message || error);
     throw new Error(error.message || "Failed to suggest skills");
+  }
+}
+
+// ─── AI JD Matcher (Resume Tailoring) ───
+export async function matchJobDescription(
+  resumeData: any,
+  jobDescription: string
+): Promise<string> {
+  const prompt = `You are an expert ATS optimizer. Analyze this resume data and job description.
+Identify missing keywords and suggest improvements for the summary and experience bullets to match the JD.
+
+Resume Data: ${JSON.stringify(resumeData)}
+Job Description: ${jobDescription}
+
+Output format: Return a JSON string with the following structure:
+{
+  "missingKeywords": ["keyword1", "keyword2"],
+  "improvedSummary": "New summary tailored to JD",
+  "suggestions": ["Suggestion 1", "Suggestion 2"]
+}
+ONLY return valid JSON, no markdown formatting.`;
+
+  try {
+    const interaction = await ai.interactions.create({
+      model: MODEL_NAME,
+      input: prompt,
+    });
+    return interaction.output_text || "{}";
+  } catch (error: any) {
+    throw new Error("Failed to match JD");
+  }
+}
+
+// ─── AI Cover Letter Generator ───
+export async function generateCoverLetter(
+  resumeData: any,
+  jobDescription: string
+): Promise<string> {
+  const prompt = `Write a professional cover letter based on the following:
+Resume: ${JSON.stringify(resumeData)}
+Job Description: ${jobDescription}
+
+Requirements:
+- Keep it under 250 words.
+- Address to "Hiring Manager".
+- Highlight key achievements from the resume that match the JD.
+- Output ONLY the cover letter text.`;
+
+  try {
+    const interaction = await ai.interactions.create({
+      model: MODEL_NAME,
+      input: prompt,
+    });
+    return interaction.output_text?.trim() || "";
+  } catch (error: any) {
+    throw new Error("Failed to generate cover letter");
   }
 }

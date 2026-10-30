@@ -46,8 +46,11 @@ export interface Certification {
 
 export interface ResumeData {
   title: string;
-  template: "modern" | "classic";
+  template: "modern" | "classic" | "minimal" | "executive" | "creative";
   accentColor: string;
+  fontFamily: string;
+  fontSize: string;
+  backgroundPattern: string;
   personal: {
     fullName: string;
     jobTitle: string;
@@ -64,6 +67,9 @@ export interface ResumeData {
   skills: Skill[];
   projects: Project[];
   certifications: Certification[];
+  jobDescription: string;
+  coverLetter?: string;
+  versionName?: string;
 }
 
 interface ResumeStore {
@@ -113,6 +119,9 @@ export const emptyResume: ResumeData = {
   title: "Untitled Resume",
   template: "modern",
   accentColor: "#2563eb",
+  fontFamily: "sans-serif",
+  fontSize: "11px",       
+  backgroundPattern: "none",
   personal: {
     fullName: "",
     jobTitle: "",
@@ -129,6 +138,9 @@ export const emptyResume: ResumeData = {
   skills: [],
   projects: [],
   certifications: [],
+  jobDescription: "",
+  coverLetter: "",
+  versionName: "Master Version",
 };
 
 // ✅ NEW: Helper to clean data before saving
