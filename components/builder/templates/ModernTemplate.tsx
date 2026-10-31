@@ -32,14 +32,17 @@ const ModernTemplate = forwardRef<HTMLDivElement, ModernTemplateProps>(
       skills.length > 0 ||
       projects.length > 0;
 
-      const bgStyle = {
+    const bgStyle = {
+      white: { backgroundColor: "#ffffff" },
+      blue: { backgroundColor: "#eff6ff" },
+      green: { backgroundColor: "#f0fdf4" },
+      yellow: { backgroundColor: "#fefce8" },
+      purple: { backgroundColor: "#faf5ff" },
+      cream: { backgroundColor: "#fffbeb" },
+      gray: { backgroundColor: "#f8fafc" },
+      rose: { backgroundColor: "#fff1f2" },
       none: { backgroundColor: "#ffffff" },
-      dots: { backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)", backgroundSize: "10px 10px" },
-      grid: { backgroundImage: "linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)", backgroundSize: "20px 20px" },
-      gradient: { background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)" },
-      lines: { backgroundImage: "repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 10px, #fff 10px, #fff 20px)" },
-      pastel: { background: "linear-gradient(to right, #fdf4ff, #f4f4f5)" },
-    }[data.backgroundPattern || "none"];
+    }[data.backgroundPattern || "white"];
 
     return (
       <div

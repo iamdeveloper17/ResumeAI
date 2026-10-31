@@ -39,19 +39,21 @@ export function PreviewModal({
         </div>
         <div className="flex items-center gap-3">
                                  <PreviewControls
-              template={data.template}
-              accentColor={data.accentColor}
-              fontFamily={data.fontFamily}
-              fontSize={data.fontSize}
-              zoom={zoom}
-              onTemplateChange={(template) => setData({ template })}
-              onColorChange={(accentColor) => setData({ accentColor })}
-              onFontFamilyChange={(fontFamily) => setData({ fontFamily })}
-              onFontSizeChange={(fontSize) => setData({ fontSize })}
-              onZoomChange={setZoom}
-              backgroundPattern={data.backgroundPattern || "none"}
-  onBackgroundChange={(pattern) => setData({ backgroundPattern: pattern })}
-            />
+  template={data.template}
+  styleVariant={data.styleVariant || 1} // 🚀 Naya
+  accentColor={data.accentColor}
+  fontFamily={data.fontFamily}
+  fontSize={data.fontSize}
+  backgroundPattern={data.backgroundPattern}
+  zoom={zoom}
+  onTemplateChange={(template) => setData({ template })}
+  onStyleVariantChange={(styleVariant) => setData({ styleVariant })} // 🚀 Naya
+  onColorChange={(accentColor) => setData({ accentColor })}
+  onFontFamilyChange={(fontFamily) => setData({ fontFamily })}
+  onFontSizeChange={(fontSize) => setData({ fontSize })}
+  onBackgroundChange={(backgroundPattern) => setData({ backgroundPattern })}
+  onZoomChange={setZoom}
+/>
           <Button onClick={onDownload} className="bg-blue-600 hover:bg-blue-700">
             <Printer className="w-4 h-4 mr-2" /> Download PDF
           </Button>

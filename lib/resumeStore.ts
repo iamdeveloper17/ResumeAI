@@ -46,7 +46,8 @@ export interface Certification {
 
 export interface ResumeData {
   title: string;
-  template: "modern" | "classic" | "minimal" | "executive" | "creative";
+  template: "modern" | "classic" | "minimal" | "executive" | "creative" | "hexagon";
+  styleVariant: number;
   accentColor: string;
   fontFamily: string;
   fontSize: string;
@@ -122,6 +123,7 @@ export const emptyResume: ResumeData = {
   fontFamily: "sans-serif",
   fontSize: "11px",       
   backgroundPattern: "none",
+  styleVariant: 1,
   personal: {
     fullName: "",
     jobTitle: "",
