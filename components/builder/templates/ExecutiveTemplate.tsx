@@ -1,44 +1,22 @@
 "use client";
 import { forwardRef } from "react";
 import type { ResumeData } from "@/lib/resumeStore";
+import ExecDesign1 from "./executive/ExecDesign1.tsx";
+import ExecDesign2 from "./executive/ExecDesign2.tsx";
+import ExecDesign3 from "./executive/ExecDesign3.tsx";
+import ExecDesign4 from "./executive/ExecDesign4.tsx";
+import ExecDesign5 from "./executive/ExecDesign5.tsx";
 
 const ExecutiveTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data }, ref) => {
-  const { personal, experience, education, skills, projects } = data;
-  const accent = data.accentColor || "#1e293b";
+  const variant = data.styleVariant || 1;
 
-  return (
-    <div ref={ref} style={{ backgroundColor: "#fff", padding: "40px", minHeight: "1123px", fontFamily: data.fontFamily || "Georgia, serif", fontSize: data.fontSize || "11px", }}>
-      {/* Header with accent side bar */}
-      <div style={{ display: "flex", gap: "20px", borderBottom: `3px solid ${accent}`, paddingBottom: "20px", marginBottom: "24px" }}>
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "bold", color: accent }}>{personal.fullName}</h1>
-          <p style={{ fontSize: "16px", color: "#555", marginTop: "4px" }}>{personal.jobTitle}</p>
-        </div>
-        <div style={{ textAlign: "right", fontSize: "11px", color: "#555", lineHeight: "1.5" }}>
-          {personal.email && <div>{personal.email}</div>}
-          {personal.phone && <div>{personal.phone}</div>}
-          {personal.location && <div>{personal.location}</div>}
-        </div>
-      </div>
+  if (variant === 2) return <ExecDesign2 ref={ref} data={data} />;
+  if (variant === 3) return <ExecDesign3 ref={ref} data={data} />;
+  if (variant === 4) return <ExecDesign4 ref={ref} data={data} />;
+  if (variant === 5) return <ExecDesign5 ref={ref} data={data} />;
 
-      {experience.length > 0 && (
-        <div style={{ marginBottom: "24px" }}>
-          <h2 style={{ fontSize: "14px", fontWeight: "bold", color: accent, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>Professional Experience</h2>
-          {experience.map((exp) => (
-            <div key={exp._id} style={{ marginBottom: "16px" }}>
-              <div style={{ fontSize: "14px", fontWeight: "bold", color: "#222" }}>{exp.position}</div>
-              <div style={{ fontSize: "12px", color: "#666", fontStyle: "italic", marginBottom: "4px" }}>{exp.company} | {exp.startDate} - {exp.current ? "Present" : exp.endDate}</div>
-              <ul style={{ fontSize: "12px", paddingLeft: "18px", lineHeight: "1.6" }}>
-                {exp.bullets.filter(Boolean).map((b, i) => <li key={i}>{b}</li>)}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Similar structure for Education, Skills etc. */}
-    </div>
-  );
+  return <ExecDesign1 ref={ref} data={data} />;
 });
+
 ExecutiveTemplate.displayName = "ExecutiveTemplate";
 export default ExecutiveTemplate;

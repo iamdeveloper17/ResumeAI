@@ -12,6 +12,24 @@ const TEMPLATES = [
   { id: "creative", name: "Creative", description: "Modern Sidebar Layout" },
 ] as const;
 
+// 🚀 Design Names based on Template
+const DESIGN_NAMES: Record<string, string[]> = {
+  modern: ["Clean Accent", "Tech Minimal", "Left Border", "Bold Colorful", "Grid Style"],
+  classic: ["Traditional Serif", "Two-Column", "Elegant Header", "Modern Classic", "Vintage Box"],
+  minimal: ["Timeless", "Left Aligned", "Boxed Minimal", "Swiss Style", "Ultra Simple"],
+  executive: ["Classic Pro", "Modern Leader", "Elegant Minimal", "Bold Matrix", "Dark Suite"],
+  creative: ["Corporate Split", "Dark Header", "Vibrant Circle", "Dynamic Diamond", "Hexagon Pro"],
+};
+
+// 🚀 5 Premium Fonts (ATS Friendly & Elegant)
+const FONTS = [
+  { id: "'Inter', sans-serif", name: "Inter (Modern)" },
+  { id: "'Roboto', sans-serif", name: "Roboto (Clean)" },
+  { id: "'Playfair Display', serif", name: "Playfair (Elegant)" },
+  { id: "'Merriweather', serif", name: "Merriweather (Classic)" },
+  { id: "'Montserrat', sans-serif", name: "Montserrat (Bold)" },
+];
+
 const COLORS = [
   { name: "Blue", value: "#2563eb" },
   { name: "Indigo", value: "#4f46e5" },
@@ -28,14 +46,14 @@ const COLORS = [
 
 interface PreviewControlsProps {
   template: "modern" | "classic" | "minimal" | "executive" | "creative";
-  styleVariant: number; // 🚀 Naya
+  styleVariant: number;
   accentColor: string;
   fontFamily: string;
   fontSize: string;
   backgroundPattern: string;
   zoom: number;
   onTemplateChange: (template: any) => void;
-  onStyleVariantChange: (variant: number) => void; // 🚀 Naya
+  onStyleVariantChange: (variant: number) => void;
   onColorChange: (color: string) => void;
   onFontFamilyChange: (font: string) => void;
   onFontSizeChange: (size: string) => void;
@@ -89,20 +107,34 @@ export default function PreviewControls({
   }, []);
 
   const currentTemplate = TEMPLATES.find((t) => t.id === template);
+  const currentFont = FONTS.find((f) => f.id === fontFamily);
+  const currentDesignName = DESIGN_NAMES[template]?.[(styleVariant || 1) - 1] || `Design ${styleVariant || 1}`;
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {/* Font Family */}
+      
+      {/* 🚀 Font Family (5 Premium Fonts) 🚀 */}
       <div className="relative" ref={fontFamilyRef}>
-        <button onClick={() => setFontFamilyOpen(!fontFamilyOpen)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
-          <span className="capitalize">{fontFamily || "Sans-Serif"}</span>
+        <button 
+          onClick={() => setFontFamilyOpen(!fontFamilyOpen)} 
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors"
+        >
+          <span>{currentFont?.name.split(" ")[0] || "Font"}</span>
           <ChevronDown className="w-3 h-3" />
         </button>
         {fontFamilyOpen && (
-          <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-            {[{ id: "sans-serif", name: "Sans-Serif" }, { id: "serif", name: "Serif" }, { id: "monospace", name: "Monospace" }].map((f) => (
-              <button key={f.id} onClick={() => { onFontFamilyChange(f.id); setFontFamilyOpen(false); }} className={cn("w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between", fontFamily === f.id && "bg-blue-50 text-blue-700 font-semibold")}>
-                {f.name}
+          <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Font Style</div>
+            {FONTS.map((f) => (
+              <button 
+                key={f.id} 
+                onClick={() => { onFontFamilyChange(f.id); setFontFamilyOpen(false); }} 
+                className={cn(
+                  "w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between", 
+                  fontFamily === f.id && "bg-blue-50 text-blue-700 font-semibold"
+                )}
+              >
+                <span style={{ fontFamily: f.id }}>{f.name}</span>
                 {fontFamily === f.id && <Check className="w-3.5 h-3.5" />}
               </button>
             ))}
@@ -151,20 +183,24 @@ export default function PreviewControls({
         )}
       </div>
 
-      {/* 🚀 NAYA: Design Variant Dropdown 🚀 */}
+      {/* 🚀 Design Variant Dropdown (With Professional Names) 🚀 */}
       <div className="relative" ref={variantRef}>
         <button onClick={() => setVariantOpen(!variantOpen)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
-          <span>Design {styleVariant || 1}</span>
+          <span>{currentDesignName}</span>
           <ChevronDown className="w-3 h-3" />
         </button>
         {variantOpen && (
-          <div className="absolute right-0 top-full mt-1 w-32 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-            {[1, 2, 3, 4, 5].map((num) => (
-              <button key={num} onClick={() => { onStyleVariantChange(num); setVariantOpen(false); }} className={cn("w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between", styleVariant === num && "bg-blue-50 text-blue-700 font-semibold")}>
-                Design {num}
-                {styleVariant === num && <Check className="w-3.5 h-3.5 text-blue-600" />}
-              </button>
-            ))}
+          <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Choose Design</div>
+            {[1, 2, 3, 4, 5].map((num) => {
+              const designName = DESIGN_NAMES[template]?.[num - 1] || `Design ${num}`;
+              return (
+                <button key={num} onClick={() => { onStyleVariantChange(num); setVariantOpen(false); }} className={cn("w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between", styleVariant === num && "bg-blue-50 text-blue-700 font-semibold")}>
+                  {designName}
+                  {styleVariant === num && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

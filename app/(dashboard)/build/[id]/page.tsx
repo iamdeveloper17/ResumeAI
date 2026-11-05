@@ -28,7 +28,7 @@ import {
   Target,
   Eye
 } from "lucide-react";
-import { AIToolsPanel } from "@/components/builder/AIToolsPanel"; 
+import { AIToolsPanel } from "@/components/builder/AIToolsPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PreviewModal } from "@/components/builder/PreviewModal";
 import { Button } from "@/components/ui/button";
@@ -199,93 +199,30 @@ export default function BuilderPage({ params }: PageProps) {
     }
   };
 
-  // ─── Print / Download PDF ───
-  const handlePrint = () => {
+  const handleDownloadPDF = async () => {
     if (!previewRef.current) return;
 
-    toast.info(
-      "💡 In print dialog, choose 'Save as PDF' as destination to download",
-      { duration: 5000 }
-    );
+    try {
+      // 🚀 Dynamic Import
+      const html2pdf = (await import("html2pdf.js")).default;
 
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-      toast.error("Please allow popups to download PDF");
-      return;
+      const element = previewRef.current;
+      const title = data.personal.fullName || "Resume";
+
+      const opt = {
+        margin: 0,
+        filename: `${title.replace(/\s+/g, "_")}_Resume.pdf`,
+        image: { type: "jpeg" as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const },
+      };
+
+      await html2pdf().set(opt).from(element).save();
+      toast.success("PDF Downloaded!");
+    } catch (error) {
+      console.error("PDF Error:", error);
+      toast.error("Failed to generate PDF");
     }
-
-    const html = previewRef.current.innerHTML;
-    const accent = data.accentColor || "#2563eb";
-    const title = data.personal.fullName || "Resume";
-    const isClassic = data.template === "classic";
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${title}</title>
-          <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-              font-family: ${
-                isClassic
-                  ? "Georgia, 'Times New Roman', serif"
-                  : "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-              };
-              font-size: 11px;
-              line-height: 1.5;
-              color: #1e293b;
-              background: #fff;
-              padding: 40px;
-            }
-            @page { size: A4; margin: 0.6in; }
-            @media print { body { padding: 0; } }
-            h1 {
-              font-size: ${isClassic ? "24px" : "26px"};
-              font-weight: 700;
-              color: ${accent};
-              margin-bottom: 4px;
-              letter-spacing: ${isClassic ? "0.05em" : "-0.02em"};
-              line-height: 1.2;
-              ${isClassic ? "text-transform: uppercase; text-align: center;" : ""}
-            }
-            h2 {
-              font-size: 11px;
-              font-weight: 700;
-              text-transform: uppercase;
-              letter-spacing: ${isClassic ? "0.15em" : "0.08em"};
-              color: ${accent};
-              margin-top: 18px;
-              margin-bottom: 8px;
-              padding-bottom: 4px;
-              border-bottom: 1px solid ${isClassic ? accent : "#e2e8f0"};
-              ${isClassic ? "text-align: center;" : ""}
-            }
-            h3 {
-              font-size: 12px;
-              font-weight: ${isClassic ? "700" : "600"};
-              color: #0f172a;
-              margin-bottom: 2px;
-            }
-            p { margin-bottom: 4px; color: #334155; }
-            ul { list-style: disc; padding-left: 18px; margin-top: 4px; }
-            li { margin-bottom: 3px; color: #334155; }
-            @media print { h1, h2, h3 { page-break-after: avoid; } }
-          </style>
-        </head>
-        <body>${html}</body>
-      </html>
-    `);
-
-    printWindow.document.close();
-    printWindow.focus();
-
-    setTimeout(() => {
-      printWindow.print();
-    }, 500);
   };
 
   // ─── Navigation ───
@@ -375,9 +312,9 @@ export default function BuilderPage({ params }: PageProps) {
 
           {/* 🚀 Naya AI Button Header me 🚀 */}
           <AIToolsPanel />
-          
+
           <button
-            onClick={handlePrint}
+            onClick={handleDownloadPDF} // 🚀 Ye change karo
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30"
           >
             <Printer className="w-4 h-4" />
@@ -462,14 +399,14 @@ export default function BuilderPage({ params }: PageProps) {
           </div>
         </div>
 
-              {/* RIGHT: Preview Action Card */}
+        {/* RIGHT: Preview Action Card */}
         <div className="w-full lg:sticky lg:top-20 h-fit">
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col items-center justify-center text-center space-y-6 min-h-[400px]">
-            
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col items-center justify-center text-center space-y-6 min-h-100">
+
             <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center">
               <Eye className="w-10 h-10 text-blue-600" />
             </div>
-            
+
             <div>
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Resume Preview</h2>
               <p className="text-slate-500 text-sm max-w-sm">
@@ -477,7 +414,7 @@ export default function BuilderPage({ params }: PageProps) {
               </p>
             </div>
 
-            <Button 
+            <Button
               onClick={() => setIsPreviewOpen(true)}
               className="w-full max-w-xs h-12 text-base bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/30 gap-2"
             >
@@ -494,7 +431,7 @@ export default function BuilderPage({ params }: PageProps) {
         data={data}
         zoom={zoom}
         setZoom={setZoom}
-        onDownload={handlePrint}
+        onDownload={handleDownloadPDF}
       />
 
       {/* 🚀 Naya: Mock Interview Modal 🚀 */}

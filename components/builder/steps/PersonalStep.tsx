@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useResumeStore } from "@/lib/resumeStore";
 import { JOB_TITLES, CITIES } from "@/lib/data/suggestions-db";
 import AutocompleteInput from "@/components/ui/autocomplete-input";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Lightbulb, Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PersonalStepProps {
@@ -16,6 +16,7 @@ export default function PersonalStep({ errors = {} }: PersonalStepProps) {
   const { data, setPersonal } = useResumeStore();
   const p = data.personal;
   const [isGenerating, setIsGenerating] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
   const inputClass = (field: string) =>
     `w-full px-3.5 py-2.5 bg-white border rounded-xl text-sm focus:outline-none focus:ring-4 transition-all ${
@@ -61,8 +62,60 @@ export default function PersonalStep({ errors = {} }: PersonalStepProps) {
     }
   };
 
+
+    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image size should be less than 2MB");
+      return;
+    }
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPersonal({ photoUrl: reader.result as string });
+      setIsUploading(false);
+      toast.success("Photo uploaded!");
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="space-y-4">
+            {/* 🚀 Profile Photo Upload 🚀 */}
+      <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4">
+        <div className="relative w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm shrink-0">
+          {p.photoUrl ? (
+            <img src={p.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <Camera className="w-8 h-8 text-slate-400" />
+          )}
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-slate-700 mb-1">Profile Photo (Optional)</label>
+          <p className="text-xs text-slate-500 mb-2">Upload a professional headshot (Max 2MB).</p>
+          
+          <div className="flex gap-2">
+            <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-colors">
+              <Camera className="w-3.5 h-3.5" />
+              {isUploading ? "Uploading..." : "Upload Photo"}
+              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+            </label>
+            
+            {p.photoUrl && (
+              <button
+                type="button"
+                onClick={() => setPersonal({ photoUrl: "" })}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" /> Remove
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">

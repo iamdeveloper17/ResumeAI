@@ -8,7 +8,8 @@ export interface IResume extends Document {
   isPublic: boolean;
   template: "modern" | "classic";
   accentColor: string;
-    jobDescription?: string;
+  textColor: string;
+  jobDescription?: string;
   coverLetter?: string;
   versionName?: string;
 
@@ -22,6 +23,7 @@ export interface IResume extends Document {
     linkedin: string;
     github: string;
     summary: string;
+    photoUrl?: string;
   };
 
   experience: Array<{
@@ -96,15 +98,16 @@ const ResumeSchema = new Schema<IResume>(
       type: Boolean,
       default: false,
     },
-template: {
-  type: String,
-  enum: ["modern", "classic", "minimal", "executive", "creative"],
-  default: "modern",
-},
+    template: {
+      type: String,
+      enum: ["modern", "classic", "minimal", "executive", "creative"],
+      default: "modern",
+    },
     accentColor: {
       type: String,
       default: "#2563eb",
     },
+    textColor: { type: String, default: "#000000" },
     personal: {
       fullName: { type: String, default: "" },
       jobTitle: { type: String, default: "" },
@@ -115,6 +118,7 @@ template: {
       linkedin: { type: String, default: "" },
       github: { type: String, default: "" },
       summary: { type: String, default: "" },
+      photoUrl: { type: String, default: "" },
     },
     experience: [
       {
@@ -141,9 +145,15 @@ template: {
     ],
     skills: [
       {
-        _id: false, // ✅ No sub-document ObjectId
+        _id: false,
         category: { type: String, default: "" },
-        items: { type: [String], default: [""] },
+        items: [
+          {
+            _id: false,
+            name: { type: String, default: "" },
+            level: { type: Number, default: 80 }
+          }
+        ],
       },
     ],
     projects: [

@@ -22,10 +22,16 @@ export interface Education {
   grade: string;
 }
 
+export interface SkillItem {
+  name: string;
+  level: number; // 🚀 Har skill ka apna level (0-100)
+}
+
 export interface Skill {
   _id?: string;
   category: string;
-  items: string[];
+  items: SkillItem[];
+  level?: number;
 }
 
 export interface Project {
@@ -49,6 +55,7 @@ export interface ResumeData {
   template: "modern" | "classic" | "minimal" | "executive" | "creative" | "hexagon";
   styleVariant: number;
   accentColor: string;
+  textColor: string;
   fontFamily: string;
   fontSize: string;
   backgroundPattern: string;
@@ -62,6 +69,7 @@ export interface ResumeData {
     linkedin: string;
     github: string;
     summary: string;
+    photoUrl?: string;
   };
   experience: Experience[];
   education: Education[];
@@ -120,6 +128,7 @@ export const emptyResume: ResumeData = {
   title: "Untitled Resume",
   template: "modern",
   accentColor: "#2563eb",
+  textColor: "#000000",
   fontFamily: "sans-serif",
   fontSize: "11px",       
   backgroundPattern: "none",
@@ -134,6 +143,7 @@ export const emptyResume: ResumeData = {
     linkedin: "",
     github: "",
     summary: "",
+    photoUrl: "",
   },
   experience: [],
   education: [],
@@ -151,6 +161,7 @@ export const cleanDataForSave = (data: ResumeData) => {
     title: data.title,
     template: data.template,
     accentColor: data.accentColor,
+    textColor: data.textColor,
     personal: data.personal,
     experience: (data.experience || []).map(
       ({ _id, ...rest }) => rest
@@ -386,7 +397,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         ...state.data,
         skills: [
           ...state.data.skills,
-          { _id: uid(), category: "", items: [""] },
+          { _id: uid(), category: "", items: [] }, // 🚀 Khali items
         ],
       },
     })),

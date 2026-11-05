@@ -2,11 +2,16 @@
 import { forwardRef } from "react";
 import type { ResumeData } from "@/lib/resumeStore";
 
-const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data }, ref) => {
-  const { personal, experience, education, skills, projects } = data;
-  const accent = data.accentColor || "#1e40af"; // Default Deep Blue
+const CreativeDesign2 = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data }, ref) => {
+const { personal, experience, education, skills, projects, certifications } = data;
+  const accent = data.accentColor || "#1e40af";
 
-  // Helper for Skill Bars
+    const textBreakStyle = {
+    wordBreak: "break-word" as const,
+    overflowWrap: "anywhere" as const,
+    whiteSpace: "pre-wrap" as const,
+  };
+
   const SkillBar = ({ name, level }: { name: string; level: number }) => (
     <div style={{ marginBottom: "12px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", fontWeight: "600", marginBottom: "4px", color: "#333", textTransform: "uppercase" }}>
@@ -20,38 +25,54 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
   );
 
   return (
-    <div ref={ref} style={{ 
-      backgroundColor: "#fff", 
-      display: "flex", 
-      minHeight: "1123px", 
-      fontFamily: data.fontFamily || "sans-serif", 
+    <div ref={ref} style={{
+      display: "flex",
+      minHeight: "1123px",
+      fontFamily: data.fontFamily || "sans-serif",
       fontSize: data.fontSize || "11px",
-      color: "#334155"
+      color: "#334155",
+      ...textBreakStyle
     }}>
-      
+
       {/* 🚀 LEFT SIDEBAR (Dark Blue) 🚀 */}
-      <div style={{ 
-        width: "32%", 
-        backgroundColor: accent, 
+      <div style={{
+        width: "32%",
+        backgroundColor: accent,
         color: "#fff",
         padding: "40px 24px",
         position: "relative"
       }}>
-        
-        {/* Profile Photo Placeholder (Diamond Shape) */}
-        <div style={{ 
-          width: "120px", 
-          height: "120px", 
+
+        {/* Profile Photo (Circle Shape) */}
+        <div style={{
+          width: "130px",
+          height: "130px",
           margin: "0 auto 30px auto",
           backgroundColor: "rgba(255,255,255,0.2)",
-          border: "4px solid #fff",
-          transform: "rotate(45deg)", // 🚀 Diamond shape
+          border: "4px solid #fff", // White border
+          borderRadius: "50%", // 🚀 Circle shape
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          marginTop: "20px"
+          marginTop: "20px",
+          overflow: "hidden",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+          position: "relative"
         }}>
-          <span style={{ transform: "rotate(-45deg)", color: "#fff", fontSize: "40px" }}>👤</span>
+          {personal.photoUrl ? (
+            <img
+              src={personal.photoUrl}
+              alt="Profile"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center 20%",
+              }}
+            />
+          ) : (
+            <span style={{ color: "#fff", fontSize: "50px" }}>👤</span>
+          )}
         </div>
 
         {/* Contact */}
@@ -83,11 +104,11 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
         {skills.length > 0 && (
           <div>
             <h2 style={{ fontSize: "14px", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: "8px", marginBottom: "16px" }}>Expertise</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {skills.flatMap(s => s.items).filter(Boolean).map((skill, i) => (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              {skills.flatMap(s => s.items).map((item, i) => (
                 <div key={i} style={{ fontSize: "11px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{ width: "4px", height: "4px", backgroundColor: "#fff", borderRadius: "50%" }}></span>
-                  {skill}
+                  {item.name}
                 </div>
               ))}
             </div>
@@ -97,7 +118,7 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
 
       {/* 🚀 RIGHT MAIN CONTENT 🚀 */}
       <div style={{ width: "68%", padding: "48px 40px" }}>
-        
+
         {/* Header */}
         <div style={{ marginBottom: "32px" }}>
           <h1 style={{ fontSize: "32px", fontWeight: "900", color: "#1e293b", textTransform: "uppercase", lineHeight: "1.1", letterSpacing: "1px" }}>
@@ -111,7 +132,7 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
         {/* Profile Summary */}
         {personal.summary && (
           <div style={{ marginBottom: "32px" }}>
-             <p style={{ fontSize: "12px", lineHeight: "1.8", color: "#64748b" }}>{personal.summary}</p>
+            <p style={{ fontSize: "12px", lineHeight: "1.8", color: "#64748b" }}>{personal.summary}</p>
           </div>
         )}
 
@@ -125,8 +146,8 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
               <div key={exp._id} style={{ marginBottom: "24px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
                   <div>
-                     <h3 style={{ fontSize: "13px", fontWeight: "bold", color: "#1e293b" }}>{exp.position}</h3>
-                     <p style={{ fontSize: "11px", fontWeight: "600", color: accent }}>{exp.company}</p>
+                    <h3 style={{ fontSize: "13px", fontWeight: "bold", color: "#1e293b" }}>{exp.position}</h3>
+                    <p style={{ fontSize: "11px", fontWeight: "600", color: accent }}>{exp.company}</p>
                   </div>
                   <div style={{ fontSize: "10px", fontWeight: "bold", color: "#94a3b8", backgroundColor: "#f1f5f9", padding: "2px 8px", borderRadius: "10px" }}>
                     {exp.startDate} - {exp.current ? "Present" : exp.endDate}
@@ -147,10 +168,48 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
               Skills
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-              {skills.flatMap(s => s.items).filter(Boolean).map((skill, i) => (
-                 <SkillBar key={i} name={skill} level={70 + (i * 5) % 30} /> // Dummy random level for bars
+              {skills.flatMap(s => s.items).map((item, i) => (
+                <SkillBar key={i} name={item.name} level={item.level} />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* 🚀 PROJECTS (Added) 🚀 */}
+        {projects && projects.length > 0 && (
+          <div style={{ marginTop: "32px" }}>
+            <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", textTransform: "uppercase", borderBottom: `2px solid ${accent}`, paddingBottom: "6px", marginBottom: "20px", display: "inline-block" }}>
+              Projects
+            </h2>
+            {projects.map((proj) => (
+              <div key={proj._id} style={{ marginBottom: "16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", alignItems: "baseline" }}>
+                  <h3 style={{ fontSize: "13px", fontWeight: "bold", color: "#1e293b" }}>{proj.name}</h3>
+                  {proj.link && <span style={{ fontSize: "10px", color: accent }}>{proj.link}</span>}
+                </div>
+                {proj.description && <p style={{ fontSize: "11px", color: "#64748b", marginTop: "4px", lineHeight: "1.6" }}>{proj.description}</p>}
+                {proj.techStack && proj.techStack.length > 0 && (
+                  <p style={{ fontSize: "10px", color: "#94a3b8", fontStyle: "italic", marginTop: "2px" }}>
+                    Tech: {proj.techStack.join(", ")}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+                {/* 🚀 CERTIFICATIONS 🚀 */}
+        {certifications && certifications.length > 0 && (
+          <div style={{ marginTop: "32px" }}>
+            <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", textTransform: "uppercase", borderBottom: `2px solid ${accent}`, paddingBottom: "6px", marginBottom: "20px", display: "inline-block" }}>
+              Certifications
+            </h2>
+            {certifications.map((cert) => (
+              <div key={cert._id} style={{ marginBottom: "12px" }}>
+                <h3 style={{ fontSize: "12px", fontWeight: "bold", color: "#1e293b" }}>{cert.name}</h3>
+                <p style={{ fontSize: "11px", color: "#64748b" }}>{cert.issuer} {cert.date && `• ${cert.date}`}</p>
+              </div>
+            ))}
           </div>
         )}
 
@@ -159,5 +218,5 @@ const DynamicTemplate = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data
   );
 });
 
-DynamicTemplate.displayName = "DynamicTemplate";
-export default DynamicTemplate;
+CreativeDesign2.displayName = "CreativeDesign2";
+export default CreativeDesign2;
