@@ -49,15 +49,11 @@ interface PreviewControlsProps {
   styleVariant: number;
   accentColor: string;
   fontFamily: string;
-  fontSize: string;
-  backgroundPattern: string;
   zoom: number;
   onTemplateChange: (template: any) => void;
   onStyleVariantChange: (variant: number) => void;
   onColorChange: (color: string) => void;
   onFontFamilyChange: (font: string) => void;
-  onFontSizeChange: (size: string) => void;
-  onBackgroundChange: (pattern: string) => void;
   onZoomChange: (zoom: number) => void;
 }
 
@@ -66,15 +62,11 @@ export default function PreviewControls({
   styleVariant,
   accentColor,
   fontFamily,
-  fontSize,
-  backgroundPattern,
   zoom,
   onTemplateChange,
   onStyleVariantChange,
   onColorChange,
   onFontFamilyChange,
-  onFontSizeChange,
-  onBackgroundChange,
   onZoomChange,
 }: PreviewControlsProps) {
   const [templateOpen, setTemplateOpen] = useState(false);
@@ -83,12 +75,7 @@ export default function PreviewControls({
   const colorRef = useRef<HTMLDivElement>(null);
 
   const [fontFamilyOpen, setFontFamilyOpen] = useState(false);
-  const [fontSizeOpen, setFontSizeOpen] = useState(false);
   const fontFamilyRef = useRef<HTMLDivElement>(null);
-  const fontSizeRef = useRef<HTMLDivElement>(null);
-
-  const [bgOpen, setBgOpen] = useState(false);
-  const bgRef = useRef<HTMLDivElement>(null);
 
   const [variantOpen, setVariantOpen] = useState(false);
   const variantRef = useRef<HTMLDivElement>(null);
@@ -98,8 +85,6 @@ export default function PreviewControls({
       if (templateRef.current && !templateRef.current.contains(e.target as Node)) setTemplateOpen(false);
       if (colorRef.current && !colorRef.current.contains(e.target as Node)) setColorOpen(false);
       if (fontFamilyRef.current && !fontFamilyRef.current.contains(e.target as Node)) setFontFamilyOpen(false);
-      if (fontSizeRef.current && !fontSizeRef.current.contains(e.target as Node)) setFontSizeOpen(false);
-      if (bgRef.current && !bgRef.current.contains(e.target as Node)) setBgOpen(false);
       if (variantRef.current && !variantRef.current.contains(e.target as Node)) setVariantOpen(false);
     };
     document.addEventListener("mousedown", handler);
@@ -136,25 +121,6 @@ export default function PreviewControls({
               >
                 <span style={{ fontFamily: f.id }}>{f.name}</span>
                 {fontFamily === f.id && <Check className="w-3.5 h-3.5" />}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Font Size */}
-      <div className="relative" ref={fontSizeRef}>
-        <button onClick={() => setFontSizeOpen(!fontSizeOpen)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
-          <span>{fontSize || "11px"}</span>
-          <ChevronDown className="w-3 h-3" />
-        </button>
-        {fontSizeOpen && (
-          <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-            {[{ id: "10px", name: "Small" }, { id: "11px", name: "Normal" }, { id: "12px", name: "Large" }, { id: "13px", name: "XL" }].map((s) => (
-              <button key={s.id} onClick={() => { onFontSizeChange(s.id); setFontSizeOpen(false); }} className={cn("w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between", fontSize === s.id && "bg-blue-50 text-blue-700 font-semibold")}>
-                <span>{s.name}</span>
-                <span className="text-xs text-slate-400">{s.id}</span>
-                {fontSize === s.id && <Check className="w-3.5 h-3.5 text-blue-600" />}
               </button>
             ))}
           </div>
@@ -218,35 +184,6 @@ export default function PreviewControls({
               {COLORS.map((c) => (
                 <button key={c.value} onClick={() => { onColorChange(c.value); setColorOpen(false); }} className={cn("w-6 h-6 rounded-md transition-all hover:scale-110 flex items-center justify-center", accentColor === c.value && "ring-2 ring-offset-1 ring-slate-400")} style={{ backgroundColor: c.value }} title={c.name}>
                   {accentColor === c.value && <Check className="w-3 h-3 text-white" />}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Background Pattern */}
-      <div className="relative" ref={bgRef}>
-        <button onClick={() => setBgOpen(!bgOpen)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors" title="Background Pattern">
-          <span>BG Style</span>
-          <ChevronDown className="w-3 h-3" />
-        </button>
-        {bgOpen && (
-          <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden p-3">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">Background Color</p>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: "white", name: "White", style: { backgroundColor: "#ffffff" } },
-                { id: "blue", name: "Blue", style: { backgroundColor: "#eff6ff" } },
-                { id: "green", name: "Green", style: { backgroundColor: "#f0fdf4" } },
-                { id: "yellow", name: "Yellow", style: { backgroundColor: "#fefce8" } },
-                { id: "purple", name: "Purple", style: { backgroundColor: "#faf5ff" } },
-                { id: "cream", name: "Cream", style: { backgroundColor: "#fffbeb" } },
-                { id: "gray", name: "Gray", style: { backgroundColor: "#f8fafc" } },
-                { id: "rose", name: "Rose", style: { backgroundColor: "#fff1f2" } },
-              ].map((bg) => (
-                <button key={bg.id} onClick={() => { onBackgroundChange(bg.id); setBgOpen(false); }} className={cn("flex flex-col items-center justify-center p-1 rounded-lg border-2 transition-all h-14 shadow-sm", backgroundPattern === bg.id ? "border-blue-500 ring-1 ring-blue-500" : "border-slate-200 hover:border-slate-300")} style={bg.style} title={bg.name}>
-                  <span className="text-[9px] font-semibold text-slate-600">{bg.name}</span>
                 </button>
               ))}
             </div>

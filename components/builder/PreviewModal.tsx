@@ -14,7 +14,6 @@ interface PreviewModalProps {
   data: any;
   zoom: number;
   setZoom: (zoom: number) => void;
-  onDownload: () => void; // (Ab optional, hum isko use nahi karenge)
 }
 
 export function PreviewModal({
@@ -84,15 +83,11 @@ export function PreviewModal({
             styleVariant={data.styleVariant || 1}
             accentColor={data.accentColor}
             fontFamily={data.fontFamily}
-            fontSize={data.fontSize}
-            backgroundPattern={data.backgroundPattern}
             zoom={zoom}
             onTemplateChange={(template) => setData({ template })}
             onStyleVariantChange={(styleVariant) => setData({ styleVariant })}
             onColorChange={(accentColor) => setData({ accentColor })}
             onFontFamilyChange={(fontFamily) => setData({ fontFamily })}
-            onFontSizeChange={(fontSize) => setData({ fontSize })}
-            onBackgroundChange={(backgroundPattern) => setData({ backgroundPattern })}
             onZoomChange={setZoom}
           />
           
@@ -130,7 +125,7 @@ export function PreviewModal({
             transform: `scale(${zoom / 100})`,
             width: "794px",
             minHeight: "1123px",
-            fontSize: data.fontSize || "11px"
+            fontSize: "12px", // 🚀 Fixed font size (ya jo bhi tum chaaho)
           }}
         >
           <TemplateRenderer ref={previewRef} data={data} />

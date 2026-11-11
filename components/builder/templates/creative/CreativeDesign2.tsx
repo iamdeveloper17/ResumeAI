@@ -2,99 +2,192 @@
 import { forwardRef } from "react";
 import type { ResumeData } from "@/lib/resumeStore";
 
+// Safe alpha helper: works with #rgb and #rrggbb (returns the color itself otherwise)
+const withAlpha = (color: string, alpha: number) => {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color.trim());
+  if (!m) return color;
+  let hex = m[1];
+  if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+  const n = parseInt(hex, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+};
+
 const CreativeDesign2 = forwardRef<HTMLDivElement, { data: ResumeData }>(({ data }, ref) => {
-const { personal, experience, education, skills, projects, certifications } = data;
+  const { personal, experience, education, skills, projects, certifications } = data;
   const accent = data.accentColor || "#1e40af";
 
-    const textBreakStyle = {
+  // 🎨 Design tokens
+  const ink = "#0f172a";
+  const body = "#475569";
+  const muted = "#94a3b8";
+  const hairline = "#e2e8f0";
+  const onAccent = "#ffffff";
+  const onAccentSoft = "rgba(255,255,255,0.78)";
+  const onAccentFaint = "rgba(255,255,255,0.16)";
+  const tint = withAlpha(accent, 0.09);
+  const tintBorder = withAlpha(accent, 0.28);
+
+  const textBreakStyle = {
     wordBreak: "break-word" as const,
     overflowWrap: "anywhere" as const,
     whiteSpace: "pre-wrap" as const,
   };
 
-  const SkillBar = ({ name, level }: { name: string; level: number }) => (
-    <div style={{ marginBottom: "12px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", fontWeight: "600", marginBottom: "4px", color: "#333", textTransform: "uppercase" }}>
-        <span>{name}</span>
-        <span>{level}%</span>
+  const printColors = {
+    WebkitPrintColorAdjust: "exact" as const,
+    printColorAdjust: "exact" as const,
+  };
+
+  const noBreak = { breakInside: "avoid" as const, pageBreakInside: "avoid" as const };
+
+  const displayName = personal.fullName || "Kathy Alvarez";
+  const displayTitle = personal.jobTitle || "Creative Designer";
+
+  const initials = displayName
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0])
+    .join("")
+    .toUpperCase();
+
+  const contactItems = [
+    { label: "Phone", value: personal.phone },
+    { label: "Email", value: personal.email },
+    { label: "Location", value: personal.location },
+    { label: "Website", value: personal.website },
+  ].filter(c => c.value);
+
+  // Skill bar (keeps the original name/level API; level is clamped so bad data can't break the layout)
+  const SkillBar = ({ name, level }: { name: string; level: number }) => {
+    const pct = Math.max(0, Math.min(100, Number(level) || 0));
+    return (
+      <div style={{ ...noBreak }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "8px", fontSize: "10px", fontWeight: 700, marginBottom: "5px", color: ink }}>
+          <span style={{ minWidth: 0 }}>{name}</span>
+          <span style={{ color: accent, fontSize: "9px", fontWeight: 700 }}>{pct}%</span>
+        </div>
+        <div style={{ width: "100%", height: "5px", backgroundColor: hairline, borderRadius: "999px", overflow: "hidden", ...printColors }}>
+          <div style={{ width: `${pct}%`, height: "100%", backgroundColor: accent, borderRadius: "999px", ...printColors }} />
+        </div>
       </div>
-      <div style={{ width: "100%", height: "6px", backgroundColor: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
-        <div style={{ width: `${level}%`, height: "100%", backgroundColor: accent, borderRadius: "3px" }} />
-      </div>
+    );
+  };
+
+  // Sidebar heading
+  const SideTitle = ({ title }: { title: string }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", whiteSpace: "normal" }}>
+      <h2 style={{ fontSize: "12.5px", fontWeight: 800, color: onAccent, letterSpacing: "0.4px", margin: 0, flexShrink: 0 }}>{title}</h2>
+      <div style={{ flex: 1, height: "1px", backgroundColor: onAccentFaint, ...printColors }} />
+    </div>
+  );
+
+  // Main heading
+  const MainTitle = ({ title }: { title: string }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "18px", whiteSpace: "normal" }}>
+      <span style={{ width: "8px", height: "8px", borderRadius: "2px", backgroundColor: accent, display: "inline-block", flexShrink: 0, ...printColors }} />
+      <h2 style={{ fontSize: "15px", fontWeight: 800, color: ink, letterSpacing: "-0.2px", margin: 0, flexShrink: 0 }}>{title}</h2>
+      <div style={{ flex: 1, height: "1px", backgroundColor: hairline, ...printColors }} />
     </div>
   );
 
   return (
-    <div ref={ref} style={{
-      display: "flex",
-      minHeight: "1123px",
-      fontFamily: data.fontFamily || "sans-serif",
-      fontSize: data.fontSize || "11px",
-      color: "#334155",
-      ...textBreakStyle
-    }}>
-
-      {/* 🚀 LEFT SIDEBAR (Dark Blue) 🚀 */}
-      <div style={{
-        width: "32%",
-        backgroundColor: accent,
-        color: "#fff",
-        padding: "40px 24px",
-        position: "relative"
-      }}>
-
-        {/* Profile Photo (Circle Shape) */}
-        <div style={{
-          width: "130px",
-          height: "130px",
-          margin: "0 auto 30px auto",
-          backgroundColor: "rgba(255,255,255,0.2)",
-          border: "4px solid #fff", // White border
-          borderRadius: "50%", // 🚀 Circle shape
+    <div
+      ref={ref}
+      style={{
+        display: "flex",
+        alignItems: "stretch",
+        minHeight: "1123px",
+        backgroundColor: "#ffffff",
+        fontFamily: data.fontFamily || "sans-serif",
+        fontSize: data.fontSize || "11px",
+        color: body,
+        ...printColors,
+        ...textBreakStyle,
+      }}
+    >
+      {/* 🚀 LEFT SIDEBAR 🚀 */}
+      <div
+        style={{
+          width: "270px",
+          flexShrink: 0,
+          backgroundColor: accent,
+          color: onAccent,
+          padding: "46px 28px 44px 28px",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: "20px",
-          overflow: "hidden",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-          position: "relative"
-        }}>
-          {personal.photoUrl ? (
-            <img
-              src={personal.photoUrl}
-              alt="Profile"
+          flexDirection: "column",
+          gap: "30px",
+          ...printColors,
+        }}
+      >
+        {/* Profile Photo (circle with soft outer ring) */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div
+            style={{
+              width: "184px",
+              height: "184px",
+              borderRadius: "50%",
+              padding: "8px",
+              boxSizing: "border-box",
+              border: `2px solid ${onAccentFaint}`,
+              ...printColors,
+            }}
+          >
+            <div
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
-                objectPosition: "center 20%",
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: "4px solid #ffffff", // White border
+                boxSizing: "border-box",
+                backgroundColor: onAccentFaint,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                ...printColors,
               }}
-            />
-          ) : (
-            <span style={{ color: "#fff", fontSize: "50px" }}>👤</span>
-          )}
-        </div>
-
-        {/* Contact */}
-        <div style={{ marginBottom: "32px" }}>
-          <h2 style={{ fontSize: "14px", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: "8px", marginBottom: "16px" }}>Contact Us</h2>
-          <div style={{ fontSize: "11px", lineHeight: "2", opacity: 0.9 }}>
-            {personal.phone && <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>📞 {personal.phone}</div>}
-            {personal.email && <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>✉️ {personal.email}</div>}
-            {personal.location && <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>📍 {personal.location}</div>}
-            {personal.website && <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>🌐 {personal.website}</div>}
+            >
+              {personal.photoUrl ? (
+                <img
+                  src={personal.photoUrl}
+                  alt="Profile"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }}
+                />
+              ) : initials ? (
+                <span style={{ color: onAccent, fontSize: "56px", fontWeight: 800, letterSpacing: "2px" }}>{initials}</span>
+              ) : (
+                <span style={{ color: onAccent, fontSize: "50px" }}>👤</span>
+              )}
+            </div>
           </div>
         </div>
 
+        {/* Contact */}
+        {contactItems.length > 0 && (
+          <div>
+            <SideTitle title="Contact" />
+            {contactItems.map(c => (
+              <div key={c.label} style={{ marginBottom: "11px" }}>
+                <div style={{ fontSize: "8.5px", fontWeight: 700, letterSpacing: "0.8px", color: onAccentSoft, opacity: 0.8 }}>{c.label}</div>
+                <div style={{ fontSize: "10.5px", color: onAccent, lineHeight: 1.45, marginTop: "1px" }}>{c.value}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Education (Sidebar) */}
         {education.length > 0 && (
-          <div style={{ marginBottom: "32px" }}>
-            <h2 style={{ fontSize: "14px", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: "8px", marginBottom: "16px" }}>Education</h2>
-            {education.map((edu) => (
-              <div key={edu._id} style={{ marginBottom: "16px" }}>
-                <div style={{ fontSize: "12px", fontWeight: "bold" }}>{edu.degree}</div>
-                <div style={{ fontSize: "10px", opacity: 0.8 }}>{edu.institution}</div>
-                <div style={{ fontSize: "9px", opacity: 0.7, marginTop: "2px" }}>{edu.startDate} - {edu.endDate}</div>
+          <div>
+            <SideTitle title="Education" />
+            {education.map(edu => (
+              <div key={edu._id} style={{ marginBottom: "15px", ...noBreak }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: onAccent, lineHeight: 1.35 }}>{edu.degree}</div>
+                <div style={{ fontSize: "10.5px", color: onAccentSoft, marginTop: "2px" }}>{edu.institution}</div>
+                <div style={{ fontSize: "9.5px", color: onAccentSoft, opacity: 0.75, marginTop: "3px", fontWeight: 600 }}>
+                  {edu.startDate} - {edu.endDate}
+                </div>
               </div>
             ))}
           </div>
@@ -103,13 +196,25 @@ const { personal, experience, education, skills, projects, certifications } = da
         {/* Expertise / Skills (Sidebar) */}
         {skills.length > 0 && (
           <div>
-            <h2 style={{ fontSize: "14px", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: "8px", marginBottom: "16px" }}>Expertise</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <SideTitle title="Expertise" />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
               {skills.flatMap(s => s.items).map((item, i) => (
-                <div key={i} style={{ fontSize: "11px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ width: "4px", height: "4px", backgroundColor: "#fff", borderRadius: "50%" }}></span>
+                <span
+                  key={i}
+                  style={{
+                    fontSize: "9.5px",
+                    fontWeight: 600,
+                    color: onAccent,
+                    backgroundColor: onAccentFaint,
+                    border: "1px solid rgba(255,255,255,0.25)",
+                    padding: "3px 10px",
+                    borderRadius: "999px",
+                    lineHeight: "1.5",
+                    ...printColors,
+                  }}
+                >
                   {item.name}
-                </div>
+                </span>
               ))}
             </div>
           </div>
@@ -117,45 +222,82 @@ const { personal, experience, education, skills, projects, certifications } = da
       </div>
 
       {/* 🚀 RIGHT MAIN CONTENT 🚀 */}
-      <div style={{ width: "68%", padding: "48px 40px" }}>
-
+      <div style={{ flex: 1, minWidth: 0, padding: "50px 44px 44px 40px" }}>
         {/* Header */}
-        <div style={{ marginBottom: "32px" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "900", color: "#1e293b", textTransform: "uppercase", lineHeight: "1.1", letterSpacing: "1px" }}>
-            {personal.fullName || "Kathy Alvarez"}
+        <div style={{ marginBottom: "28px" }}>
+          <h1 style={{ fontSize: "42px", fontWeight: 900, color: ink, lineHeight: 1.02, letterSpacing: "-1.6px", margin: 0 }}>
+            {displayName}
           </h1>
-          <p style={{ fontSize: "14px", fontWeight: "600", color: accent, textTransform: "uppercase", letterSpacing: "2px", marginTop: "6px" }}>
-            {personal.jobTitle || "Creative Designer"}
-          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px" }}>
+            <div style={{ width: "34px", height: "3px", borderRadius: "2px", backgroundColor: accent, ...printColors }} />
+            <p style={{ fontSize: "13px", fontWeight: 700, color: accent, letterSpacing: "1.2px", margin: 0 }}>{displayTitle}</p>
+          </div>
         </div>
 
         {/* Profile Summary */}
         {personal.summary && (
-          <div style={{ marginBottom: "32px" }}>
-            <p style={{ fontSize: "12px", lineHeight: "1.8", color: "#64748b" }}>{personal.summary}</p>
+          <div
+            style={{
+              marginBottom: "32px",
+              padding: "16px 20px",
+              backgroundColor: tint,
+              borderLeft: `3px solid ${accent}`,
+              borderRadius: "0 12px 12px 0",
+              ...noBreak,
+              ...printColors,
+            }}
+          >
+            <p style={{ fontSize: "12px", lineHeight: "1.85", color: ink, margin: 0 }}>{personal.summary}</p>
           </div>
         )}
 
         {/* Work Experience */}
         {experience.length > 0 && (
           <div>
-            <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", textTransform: "uppercase", borderBottom: `2px solid ${accent}`, paddingBottom: "6px", marginBottom: "20px", display: "inline-block" }}>
-              Work Experiences
-            </h2>
-            {experience.map((exp) => (
-              <div key={exp._id} style={{ marginBottom: "24px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
-                  <div>
-                    <h3 style={{ fontSize: "13px", fontWeight: "bold", color: "#1e293b" }}>{exp.position}</h3>
-                    <p style={{ fontSize: "11px", fontWeight: "600", color: accent }}>{exp.company}</p>
-                  </div>
-                  <div style={{ fontSize: "10px", fontWeight: "bold", color: "#94a3b8", backgroundColor: "#f1f5f9", padding: "2px 8px", borderRadius: "10px" }}>
+            <MainTitle title="Work Experiences" />
+            {experience.map((exp, idx) => (
+              <div
+                key={exp._id}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "104px minmax(0, 1fr)",
+                  columnGap: "20px",
+                  paddingTop: idx === 0 ? 0 : "18px",
+                  marginBottom: "18px",
+                  borderTop: idx === 0 ? "none" : `1px solid ${hairline}`,
+                  ...noBreak,
+                }}
+              >
+                <div>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      fontSize: "9px",
+                      fontWeight: 700,
+                      color: accent,
+                      backgroundColor: tint,
+                      border: `1px solid ${tintBorder}`,
+                      padding: "3px 9px",
+                      borderRadius: "999px",
+                      lineHeight: 1.4,
+                      ...printColors,
+                    }}
+                  >
                     {exp.startDate} - {exp.current ? "Present" : exp.endDate}
-                  </div>
+                  </span>
                 </div>
-                <ul style={{ fontSize: "11px", paddingLeft: "16px", color: "#64748b", lineHeight: "1.7", listStyleType: "disc" }}>
-                  {exp.bullets.filter(Boolean).map((b, i) => <li key={i} style={{ marginBottom: "4px" }}>{b}</li>)}
-                </ul>
+                <div style={{ minWidth: 0 }}>
+                  <h3 style={{ fontSize: "13.5px", fontWeight: 700, color: ink, margin: 0 }}>{exp.position}</h3>
+                  <p style={{ fontSize: "11.5px", fontWeight: 600, color: accent, margin: "2px 0 8px 0" }}>{exp.company}</p>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: "10.5px", color: body, lineHeight: "1.7" }}>
+                    {exp.bullets.filter(Boolean).map((b, i) => (
+                      <li key={i} style={{ display: "flex", gap: "10px", marginBottom: "3px" }}>
+                        <span style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: accent, marginTop: "8px", flexShrink: 0, ...printColors }} />
+                        <span style={{ minWidth: 0 }}>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
@@ -163,11 +305,9 @@ const { personal, experience, education, skills, projects, certifications } = da
 
         {/* Skills (Right side bar chart style) */}
         {skills.length > 0 && (
-          <div style={{ marginTop: "32px" }}>
-            <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", textTransform: "uppercase", borderBottom: `2px solid ${accent}`, paddingBottom: "6px", marginBottom: "20px", display: "inline-block" }}>
-              Skills
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div style={{ marginTop: "30px" }}>
+            <MainTitle title="Skills" />
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", columnGap: "28px", rowGap: "14px" }}>
               {skills.flatMap(s => s.items).map((item, i) => (
                 <SkillBar key={i} name={item.name} level={item.level} />
               ))}
@@ -177,42 +317,80 @@ const { personal, experience, education, skills, projects, certifications } = da
 
         {/* 🚀 PROJECTS (Added) 🚀 */}
         {projects && projects.length > 0 && (
-          <div style={{ marginTop: "32px" }}>
-            <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", textTransform: "uppercase", borderBottom: `2px solid ${accent}`, paddingBottom: "6px", marginBottom: "20px", display: "inline-block" }}>
-              Projects
-            </h2>
-            {projects.map((proj) => (
-              <div key={proj._id} style={{ marginBottom: "16px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", alignItems: "baseline" }}>
-                  <h3 style={{ fontSize: "13px", fontWeight: "bold", color: "#1e293b" }}>{proj.name}</h3>
-                  {proj.link && <span style={{ fontSize: "10px", color: accent }}>{proj.link}</span>}
+          <div style={{ marginTop: "30px" }}>
+            <MainTitle title="Projects" />
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: "12px" }}>
+              {projects.map(proj => (
+                <div
+                  key={proj._id}
+                  style={{
+                    padding: "13px 15px",
+                    backgroundColor: "#f8fafc",
+                    border: `1px solid ${hairline}`,
+                    borderTop: `3px solid ${accent}`,
+                    borderRadius: "10px",
+                    ...noBreak,
+                    ...printColors,
+                  }}
+                >
+                  <h3 style={{ fontSize: "12px", fontWeight: 700, color: ink, margin: 0 }}>{proj.name}</h3>
+                  {proj.link && <div style={{ fontSize: "9px", color: accent, marginTop: "2px" }}>{proj.link}</div>}
+                  {proj.description && (
+                    <p style={{ fontSize: "10px", color: body, marginTop: "4px", lineHeight: "1.6", marginBottom: 0 }}>{proj.description}</p>
+                  )}
+                  {proj.techStack && proj.techStack.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }}>
+                      {proj.techStack.map((t, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            fontSize: "8.5px",
+                            fontWeight: 600,
+                            color: accent,
+                            backgroundColor: tint,
+                            padding: "1px 7px",
+                            borderRadius: "999px",
+                            lineHeight: "1.5",
+                            ...printColors,
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                {proj.description && <p style={{ fontSize: "11px", color: "#64748b", marginTop: "4px", lineHeight: "1.6" }}>{proj.description}</p>}
-                {proj.techStack && proj.techStack.length > 0 && (
-                  <p style={{ fontSize: "10px", color: "#94a3b8", fontStyle: "italic", marginTop: "2px" }}>
-                    Tech: {proj.techStack.join(", ")}
-                  </p>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
-                {/* 🚀 CERTIFICATIONS 🚀 */}
+        {/* 🚀 CERTIFICATIONS 🚀 */}
         {certifications && certifications.length > 0 && (
-          <div style={{ marginTop: "32px" }}>
-            <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", textTransform: "uppercase", borderBottom: `2px solid ${accent}`, paddingBottom: "6px", marginBottom: "20px", display: "inline-block" }}>
-              Certifications
-            </h2>
-            {certifications.map((cert) => (
-              <div key={cert._id} style={{ marginBottom: "12px" }}>
-                <h3 style={{ fontSize: "12px", fontWeight: "bold", color: "#1e293b" }}>{cert.name}</h3>
-                <p style={{ fontSize: "11px", color: "#64748b" }}>{cert.issuer} {cert.date && `• ${cert.date}`}</p>
-              </div>
-            ))}
+          <div style={{ marginTop: "30px" }}>
+            <MainTitle title="Certifications" />
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: "12px" }}>
+              {certifications.map(cert => (
+                <div
+                  key={cert._id}
+                  style={{
+                    padding: "10px 14px",
+                    borderLeft: `3px solid ${accent}`,
+                    backgroundColor: "#f8fafc",
+                    borderRadius: "0 8px 8px 0",
+                    ...noBreak,
+                    ...printColors,
+                  }}
+                >
+                  <h3 style={{ fontSize: "11.5px", fontWeight: 700, color: ink, margin: 0, lineHeight: 1.35 }}>{cert.name}</h3>
+                  <p style={{ fontSize: "10px", color: muted, margin: "2px 0 0 0" }}>
+                    {cert.issuer} {cert.date && `• ${cert.date}`}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
-
       </div>
     </div>
   );

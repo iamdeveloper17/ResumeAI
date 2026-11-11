@@ -16,19 +16,7 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
   ({ data }, ref) => {
     const template = data.template || "modern";
 
-    // 🚀 Background Colors Mapping
-    const bgColors: Record<string, string> = {
-      white: "#ffffff",
-      blue: "#eff6ff",
-      green: "#f0fdf4",
-      yellow: "#fefce8",
-      purple: "#faf5ff",
-      cream: "#fffbeb",
-      gray: "#f8fafc",
-      rose: "#fff1f2",
-    };
-
-    const bgColor = bgColors[data.backgroundPattern] || "#ffffff";
+    const bgColor = "#ffffff";
 
     // 🚀 Wrapper div jo background handle karega
     return (

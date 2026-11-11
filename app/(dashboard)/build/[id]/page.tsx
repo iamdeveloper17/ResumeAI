@@ -23,7 +23,6 @@ import {
   ArrowRight,
   Save,
   AlertCircle,
-  Printer,
   Loader2,
   Target,
   Eye
@@ -199,32 +198,6 @@ export default function BuilderPage({ params }: PageProps) {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    if (!previewRef.current) return;
-
-    try {
-      // 🚀 Dynamic Import
-      const html2pdf = (await import("html2pdf.js")).default;
-
-      const element = previewRef.current;
-      const title = data.personal.fullName || "Resume";
-
-      const opt = {
-        margin: 0,
-        filename: `${title.replace(/\s+/g, "_")}_Resume.pdf`,
-        image: { type: "jpeg" as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const },
-      };
-
-      await html2pdf().set(opt).from(element).save();
-      toast.success("PDF Downloaded!");
-    } catch (error) {
-      console.error("PDF Error:", error);
-      toast.error("Failed to generate PDF");
-    }
-  };
-
   // ─── Navigation ───
   const handleBack = () => {
     if (isFirstStep) {
@@ -312,15 +285,6 @@ export default function BuilderPage({ params }: PageProps) {
 
           {/* 🚀 Naya AI Button Header me 🚀 */}
           <AIToolsPanel />
-
-          <button
-            onClick={handleDownloadPDF} // 🚀 Ye change karo
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30"
-          >
-            <Printer className="w-4 h-4" />
-            <span className="hidden sm:inline">Download PDF</span>
-            <span className="sm:hidden">PDF</span>
-          </button>
         </div>
       </div>
 
@@ -431,7 +395,6 @@ export default function BuilderPage({ params }: PageProps) {
         data={data}
         zoom={zoom}
         setZoom={setZoom}
-        onDownload={handleDownloadPDF}
       />
 
       {/* 🚀 Naya: Mock Interview Modal 🚀 */}
