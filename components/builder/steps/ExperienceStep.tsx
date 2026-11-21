@@ -20,23 +20,24 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
     removeBullet,
   } = useResumeStore();
 
+  // 🎯 Theme-aware input classes
   const inputClass = (field: string) =>
-    `w-full px-3 py-2 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${
+    `w-full px-3 py-2 bg-background text-foreground border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${
       errors[field]
-        ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-        : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10"
+        ? "border-destructive focus:border-destructive focus:ring-destructive/10"
+        : "border-input focus:border-primary focus:ring-primary/10"
     }`;
 
   return (
     <div className="space-y-4">
       {data.experience.length === 0 && (
-        <div className="text-center py-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
-          <p className="text-sm text-slate-500 mb-4">
+        <div className="text-center py-8 bg-muted/50 border-2 border-dashed border-border rounded-2xl transition-colors">
+          <p className="text-sm text-muted-foreground mb-4">
             No work experience added yet
           </p>
           <button
             onClick={addExperience}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Add Work Experience
@@ -47,15 +48,16 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
       {data.experience.map((exp, index) => (
         <div
           key={exp._id}
-          className="bg-slate-50 rounded-2xl p-4 border border-slate-200"
+          // 🎯 Card background & border fixed
+          className="bg-card text-card-foreground rounded-2xl p-4 border border-border transition-colors"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Experience {index + 1}
             </span>
             <button
               onClick={() => removeExperience(exp._id!)}
-              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -63,7 +65,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <div className="min-w-0">
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-foreground mb-1">
                 Company *
               </label>
               <AutocompleteInput
@@ -77,7 +79,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
               />
             </div>
             <div className="min-w-0">
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-foreground mb-1">
                 Position *
               </label>
               <AutocompleteInput
@@ -94,7 +96,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
             <div className="min-w-0">
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-foreground mb-1">
                 Location
               </label>
               <AutocompleteInput
@@ -107,12 +109,12 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
               />
             </div>
             <div className="min-w-0">
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-foreground mb-1">
                 Start Date
               </label>
               <input
                 type="month"
-                className={inputClass("")}
+                className={`${inputClass("")} [color-scheme:light] dark:[color-scheme:dark]`} // 🎯 Date icon color fix
                 value={exp.startDate}
                 onChange={(e) =>
                   updateExperience(exp._id!, { startDate: e.target.value })
@@ -120,12 +122,12 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
               />
             </div>
             <div className="min-w-0">
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-foreground mb-1">
                 End Date
               </label>
               <input
                 type="month"
-                className={`${inputClass("")} disabled:opacity-50`}
+                className={`${inputClass("")} disabled:opacity-50 [color-scheme:light] dark:[color-scheme:dark]`}
                 value={exp.endDate}
                 disabled={exp.current}
                 onChange={(e) =>
@@ -135,7 +137,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 mb-3 text-sm text-slate-600 cursor-pointer">
+          <label className="flex items-center gap-2 mb-3 text-sm text-foreground cursor-pointer">
             <input
               type="checkbox"
               checked={exp.current}
@@ -145,13 +147,14 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
                   endDate: e.target.checked ? "" : exp.endDate,
                 })
               }
-              className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              // 🎯 Checkbox accent color fixed
+              className="w-4 h-4 rounded border-border text-primary accent-primary focus:ring-primary"
             />
             I currently work here
           </label>
 
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-2">
+            <label className="block text-xs font-medium text-foreground mb-2">
               Key Achievements
             </label>
             <div className="space-y-2">
@@ -172,7 +175,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
                   {exp.bullets.length > 1 && (
                     <button
                       onClick={() => removeBullet(exp._id!, i)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg shrink-0"
+                      className="p-2 text-destructive hover:bg-destructive/10 rounded-lg shrink-0 transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -182,7 +185,7 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
             </div>
             <button
               onClick={() => addBullet(exp._id!)}
-              className="mt-2 text-xs text-blue-600 font-medium hover:underline flex items-center gap-1"
+              className="mt-2 text-xs text-primary font-medium hover:underline flex items-center gap-1 transition-colors"
             >
               <Plus className="w-3 h-3" />
               Add another bullet
@@ -194,7 +197,8 @@ export default function ExperienceStep({ errors = {} }: ExperienceStepProps) {
       {data.experience.length > 0 && (
         <button
           onClick={addExperience}
-          className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2"
+          // 🎯 Dashed box styling fixed
+          className="w-full py-3 border-2 border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add another experience

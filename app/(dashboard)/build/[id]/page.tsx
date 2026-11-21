@@ -231,7 +231,7 @@ export default function BuilderPage({ params }: PageProps) {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Loading resume...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Loading resume...</p>
         </div>
       </div>
     );
@@ -244,17 +244,17 @@ export default function BuilderPage({ params }: PageProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/resumes")}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-600" />
+            <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" />
           </button>
           <div>
             <input
-              className="text-xl font-bold text-slate-900 bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 rounded px-1 -ml-1"
+              className="text-xl font-bold text-slate-900 dark:text-white bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 rounded px-1 -ml-1"
               value={data.title}
               onChange={(e) => setData({ title: e.target.value })}
             />
-            <p className="text-xs text-slate-500 flex items-center gap-1.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
               {isSavingLocal ? (
                 <>
                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -277,7 +277,7 @@ export default function BuilderPage({ params }: PageProps) {
           <Button
             onClick={() => setIsInterviewOpen(true)}
             variant="outline"
-            className="border-purple-200 text-purple-700 hover:bg-purple-50 gap-2 h-10 px-4 rounded-xl"
+            className="border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 gap-2 h-10 px-4 rounded-xl"
           >
             <Target className="w-4 h-4" />
             <span className="hidden sm:inline">Mock Interview</span>
@@ -292,22 +292,22 @@ export default function BuilderPage({ params }: PageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: Form */}
         <div className="w-full">
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 shadow-sm">
             <StepIndicator currentStep={currentStep} onStepClick={setStep} />
 
             <div className="mb-4">
-              <h2 className="text-lg font-bold text-slate-900 mb-1">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
                 {STEPS[currentStep]}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Step {currentStep + 1} of {STEPS.length}
               </p>
             </div>
 
             {Object.keys(errors).length > 0 && (
-              <div className="flex items-start gap-2 p-3 mb-4 bg-red-50 border border-red-200 rounded-xl">
+              <div className="flex items-start gap-2 p-3 mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
                 <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                <p className="text-xs text-red-700">
+                <p className="text-xs text-red-700 dark:text-red-400">
                   Please fill all required fields before proceeding
                 </p>
               </div>
@@ -317,10 +317,10 @@ export default function BuilderPage({ params }: PageProps) {
               <CurrentStepComponent errors={errors} />
             </div>
 
-            <div className="flex items-center justify-between gap-3 mt-6 pt-6 border-t border-slate-200">
+            <div className="flex items-center justify-between gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
               <button
                 onClick={handleBack}
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 {isFirstStep ? "Cancel" : "Back"}
@@ -365,15 +365,14 @@ export default function BuilderPage({ params }: PageProps) {
 
         {/* RIGHT: Preview Action Card */}
         <div className="w-full lg:sticky lg:top-20 h-fit">
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col items-center justify-center text-center space-y-6 min-h-100">
-
-            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center">
-              <Eye className="w-10 h-10 text-blue-600" />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm flex flex-col items-center justify-center text-center space-y-6 min-h-100">
+            <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <Eye className="w-10 h-10 text-blue-600 dark:text-blue-400" />
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Resume Preview</h2>
-              <p className="text-slate-500 text-sm max-w-sm">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Resume Preview</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm">
                 Click the button below to view your resume in full screen. You can zoom, change templates, and download the PDF.
               </p>
             </div>

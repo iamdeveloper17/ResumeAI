@@ -4,7 +4,52 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "",
 });
 
-const MODEL_NAME = "gemini-flash-latest";   // ← Ye auto-detect karega
+// 🚀 List of models to try (Fallback System)
+// 🚀 List of models to try (Fallback System - Updated for 2026)
+const MODEL_FALLBACKS = [
+  "gemini-3.8-flash",       // Primary (Naya aur stable)
+  "gemini-3.6-flash",       // Fallback 1
+  "gemini-3.5-flash",       // Fallback 2
+  "gemini-2.5-flash"        // Last Resort (agar purana key ho toh)
+];
+
+// 🚀 Helper Function: Jo automatically fallback karega
+async function generateWithFallback(prompt: string, retries = 3): Promise<string> {
+  let lastError: any = null;
+
+  for (const model of MODEL_FALLBACKS) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        console.log(`🤖 Trying model: ${model} (Attempt ${attempt}/${retries})`);
+        
+        const interaction = await ai.interactions.create({
+          model: model,
+          input: prompt,
+        });
+
+        const text = interaction.output_text;
+        if (text) {
+          console.log(`✅ Success with model: ${model}`);
+          return text;
+        }
+        throw new Error("Empty response from Gemini");
+      } catch (error: any) {
+        console.warn(`⚠️ Model ${model} failed on attempt ${attempt}:`, error.message);
+        lastError = error;
+        
+        // Agar 503 (High demand) ya 429 (Rate limit) hai, toh 1-2 second wait karke retry karo
+        if (error.message?.includes("503") || error.message?.includes("429")) {
+          await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+        } else {
+          // Agar 400 ya 401 jaisa error hai, toh model change karo (retry mat karo)
+          break; 
+        }
+      }
+    }
+  }
+
+  throw new Error(lastError?.message || "All AI models failed. Please try again later.");
+}
 
 // ─── AI Summary Generator ───
 export async function generateSummary(
@@ -30,19 +75,7 @@ CRITICAL RULES:
 Example of a GOOD output:
 "Software Engineer with 2 years of experience developing scalable web applications using React and Node.js. Skilled in optimizing database queries and building responsive user interfaces, with a strong focus on clean code and seamless user experience."`;
 
-  try {
-    const interaction = await ai.interactions.create({
-      model: MODEL_NAME,
-      input: prompt,
-    });
-
-    const text = interaction.output_text;
-    if (!text) throw new Error("Empty response from Gemini");
-    return text.trim();
-  } catch (error: any) {
-    console.error("Gemini generateSummary error:", error.message || error);
-    throw new Error(error.message || "Failed to generate summary");
-  }
+  return generateWithFallback(prompt);
 }
 
 // ─── AI Bullet Enhancer ───
@@ -69,19 +102,8 @@ Requirements:
 
 Output ONLY the enhanced bullet point, nothing else.`;
 
-  try {
-    const interaction = await ai.interactions.create({
-      model: MODEL_NAME,
-      input: prompt,
-    });
-
-    const text = interaction.output_text;
-    if (!text) throw new Error("Empty response from Gemini");
-    return text.trim().replace(/^[•\-\*]\s*/, "");
-  } catch (error: any) {
-    console.error("Gemini enhanceBullet error:", error.message || error);
-    throw new Error(error.message || "Failed to enhance bullet");
-  }
+  const text = await generateWithFallback(prompt);
+  return text.trim().replace(/^[•\-\*]\s*/, "");
 }
 
 // ─── AI Skill Suggester ───
@@ -101,25 +123,40 @@ Output format: ONLY comma-separated list. Example: React, Node.js, MongoDB, Type
 
 No numbering, no explanations, no bullet points.`;
 
-  try {
-    const interaction = await ai.interactions.create({
-      model: MODEL_NAME,
-      input: prompt,
-    });
+  const text = await generateWithFallback(prompt);
+  return text
+    .trim()
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 10);
+}
 
-    const text = interaction.output_text;
-    if (!text) throw new Error("Empty response from Gemini");
+// ─── AI Project Description Generator ───
+export async function generateProjectDescription(
+  projectName: string,
+  techStack: string[],
+  draft: string,
+  jobTitle: string
+): Promise<string> {
+  const prompt = `You are an expert resume writer. Write a professional 2-line description for a project.
 
-    return text
-      .trim()
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .slice(0, 10);
-  } catch (error: any) {
-    console.error("Gemini suggestSkills error:", error.message || error);
-    throw new Error(error.message || "Failed to suggest skills");
-  }
+Project Name: ${projectName}
+Tech Stack: ${techStack.length > 0 ? techStack.join(", ") : "Not specified"}
+Target Role: ${jobTitle}
+User's rough draft: ${draft || "None"}
+
+Requirements:
+- Write in FIRST PERSON without using "I" (e.g., "Built a full-stack e-commerce platform...")
+- Focus on the IMPACT and what was achieved
+- Include metrics if possible (e.g., "improving load time by 30%")
+- Max 2 sentences, under 40 words
+- Use strong action verbs at the start (Developed, Engineered, Built, Designed)
+- Do NOT add quotes or prefixes like "Description:"
+
+Output ONLY the description text.`;
+
+  return generateWithFallback(prompt);
 }
 
 // ─── AI JD Matcher (Resume Tailoring) ───
@@ -141,15 +178,14 @@ Output format: Return a JSON string with the following structure:
 }
 ONLY return valid JSON, no markdown formatting.`;
 
-  try {
-    const interaction = await ai.interactions.create({
-      model: MODEL_NAME,
-      input: prompt,
-    });
-    return interaction.output_text || "{}";
-  } catch (error: any) {
-    throw new Error("Failed to match JD");
+  const text = await generateWithFallback(prompt);
+  
+  // 🚀 JSON Extract karo (Agar AI ne markdown lagaya ho)
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return jsonMatch[0];
   }
+  return "{}";
 }
 
 // ─── AI Cover Letter Generator ───
@@ -167,13 +203,5 @@ Requirements:
 - Highlight key achievements from the resume that match the JD.
 - Output ONLY the cover letter text.`;
 
-  try {
-    const interaction = await ai.interactions.create({
-      model: MODEL_NAME,
-      input: prompt,
-    });
-    return interaction.output_text?.trim() || "";
-  } catch (error: any) {
-    throw new Error("Failed to generate cover letter");
-  }
+  return generateWithFallback(prompt);
 }

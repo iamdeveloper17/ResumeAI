@@ -32,7 +32,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
           onClick={onClose}
         />
       )}
@@ -40,23 +40,24 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static top-0 left-0 bottom-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 transition-transform duration-300",
+          // 🎯 Updated: bg-card & border-border for theme support
+          "fixed lg:static top-0 left-0 bottom-0 z-50 w-64 bg-card border-r border-border flex flex-col shrink-0 transition-transform duration-300",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-slate-200">
-          <span className="font-bold text-slate-900">Menu</span>
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-border">
+          <span className="font-bold text-foreground">Menu</span>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-lg"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-slate-600" />
+            <X className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
         <nav className="p-3 space-y-1 flex-1">
-          <p className="px-3 pt-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <p className="px-3 pt-3 pb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
             Workspace
           </p>
           {links.map((link) => {
@@ -73,19 +74,19 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                   isActive
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 <Icon
                   className={cn(
                     "w-5 h-5 shrink-0",
-                    isActive ? "text-blue-600" : "text-slate-400"
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 />
                 <span>{link.label}</span>
                 {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </Link>
             );
@@ -94,8 +95,9 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
         {/* Upgrade card */}
         <div className="p-3">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-4 text-white">
-            <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-blue-500/30 blur-2xl" />
+          {/* 🎯 Updated: Gradient card uses card/border variables */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 p-4 text-white border border-transparent dark:border-border">
+            <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-primary/30 blur-2xl" />
             <div className="relative">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4" />

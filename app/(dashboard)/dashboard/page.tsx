@@ -10,22 +10,23 @@ export default async function DashboardPage() {
       label: "Total Resumes",
       value: "0",
       icon: FileText,
-      bg: "bg-blue-50",
-      color: "text-blue-600",
+      // 🎯 Updated: Theme variables for Dark/Light compatibility
+      bg: "bg-primary/10", 
+      color: "text-primary",
     },
     {
       label: "AI Credits",
       value: "10",
       icon: Sparkles,
-      bg: "bg-purple-50",
-      color: "text-purple-600",
+      bg: "bg-purple-500/10",
+      color: "text-purple-600 dark:text-purple-400",
     },
     {
       label: "Total Views",
       value: "0",
       icon: TrendingUp,
-      bg: "bg-emerald-50",
-      color: "text-emerald-600",
+      bg: "bg-emerald-500/10",
+      color: "text-emerald-600 dark:text-emerald-400",
     },
   ];
 
@@ -63,35 +64,36 @@ export default async function DashboardPage() {
           return (
             <div
               key={stat.label}
-              className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg hover:shadow-blue-100 transition-all"
+              // 🎯 Updated: bg-card, text-foreground, border-border
+              className="bg-card text-card-foreground rounded-2xl border border-border p-6 hover:shadow-lg transition-all"
             >
               <div
                 className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}
               >
                 <Icon className={`w-5 h-5 ${stat.color}`} />
               </div>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-              <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
+              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
             </div>
           );
         })}
       </div>
 
       {/* Empty state */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
-          <FileText className="w-8 h-8 text-blue-500" />
+      <div className="bg-card text-card-foreground rounded-2xl border border-border p-12 text-center transition-colors">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+          <FileText className="w-8 h-8 text-primary" />
         </div>
-        <h3 className="text-lg font-semibold text-slate-900 mb-1">
+        <h3 className="text-lg font-semibold text-foreground mb-1">
           No resumes yet
         </h3>
-        <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
+        <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
           Create your first AI-powered resume and start applying for jobs
           today.
         </p>
         <Link
           href="/resumes/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg"
         >
           <Plus className="w-4 h-4" />
           Create your first resume

@@ -26,8 +26,15 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  /* 🎨 Fonts */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-playfair);
+  --font-serif: var(--font-merriweather);
+  --font-mono: var(--font-roboto);
 }
 
+/* 🚀 Light Mode Variables */
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -51,12 +58,82 @@
   --radius: 0.75rem;
 }
 
+/* 🚀 Dark Mode Variables */
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.65 0.22 264);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.65 0.22 264);
+}
+
 @layer base {
   * {
     @apply border-border;
   }
+
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased transition-colors;
+  }
+
+  /* 🎯 Inputs — CSS variables based (no hardcoded slate) */
+  input,
+  textarea,
+  select {
+    @apply bg-background text-foreground border-input placeholder:text-muted-foreground;
+  }
+
+  /* 🚀 FAIL-SAFE RULES: Dark Mode Overrides */
+  /* Ye rules un sabhi jagah fix karenge jahan abhi bhi bg-white ya text-slate-900 bacha hua hai */
+  .dark .bg-white {
+    background-color: var(--card) !important;
+    color: var(--card-foreground) !important;
+    border-color: var(--border) !important;
+  }
+
+  .dark .text-slate-900,
+  .dark .text-slate-800,
+  .dark .text-black,
+  .dark .text-gray-900 {
+    color: var(--foreground) !important;
+  }
+
+  .dark .text-slate-500,
+  .dark .text-slate-600,
+  .dark .text-gray-500 {
+    color: var(--muted-foreground) !important;
+  }
+
+  .dark .border-slate-200,
+  .dark .border-slate-300,
+  .dark .border-gray-200 {
+    border-color: var(--border) !important;
+  }
+
+  /* Search bar jaise inputs ko force dark karne ke liye */
+  .dark input[type="text"],
+  .dark input[type="search"] {
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+    border-color: var(--border) !important;
   }
 }
 
@@ -92,6 +169,33 @@
       padding-right: 2rem;
     }
   }
+
+  /* 🎯 RESUME PREVIEW — ALWAYS LIGHT (print-ready) */
+  .resume-preview {
+    color-scheme: light;
+    background: white !important;
+    color: black !important;
+  }
+
+  .resume-preview * {
+    color-scheme: light;
+  }
+
+  /* Force light inputs inside resume preview even in dark mode */
+  .dark .resume-preview input,
+  .dark .resume-preview textarea,
+  .dark .resume-preview select {
+    background: white !important;
+    color: black !important;
+    border-color: #e5e7eb !important;
+  }
+
+  /* Prevent dark variant utilities from affecting resume preview */
+  .resume-preview .dark\:text-white,
+  .resume-preview .dark\:bg-slate-950 {
+    color: inherit !important;
+    background: transparent !important;
+  }
 }
 
 @layer components {
@@ -115,7 +219,7 @@
   }
 }
 
-/* Custom scrollbar */
+/* 🎯 Custom scrollbar — theme-aware */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -124,9 +228,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.85 0 0);
+  background: var(--border);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.7 0 0);
+  background: var(--muted-foreground);
 }

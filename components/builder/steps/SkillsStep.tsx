@@ -61,13 +61,13 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
   return (
     <div className="space-y-4">
       {data.skills.length === 0 && (
-        <div className="text-center py-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
-          <p className="text-sm text-slate-500 mb-4">
+        <div className="text-center py-8 bg-muted/50 border-2 border-dashed border-border rounded-2xl transition-colors">
+          <p className="text-sm text-muted-foreground mb-4">
             No skill categories yet
           </p>
           <button
             onClick={addSkill}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Add Skill Category
@@ -89,15 +89,16 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
         return (
           <div
             key={skill._id}
-            className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm"
+            // 🎯 Card background fixed
+            className="bg-card text-card-foreground rounded-2xl p-5 border border-border shadow-sm transition-colors"
           >
             {/* Category Name */}
             <div className="flex items-center gap-3 mb-4">
               <input
-                className={`flex-1 px-3 py-2 bg-slate-50 border rounded-lg text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 transition-all ${
+                className={`flex-1 px-3 py-2 bg-background border rounded-lg text-sm font-bold text-foreground focus:outline-none focus:ring-2 transition-all ${
                   errors[`skill-${index}-category`]
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10"
+                    ? "border-destructive focus:border-destructive focus:ring-destructive/10"
+                    : "border-input focus:border-primary focus:ring-primary/10"
                 }`}
                 placeholder="Category (e.g., Frontend, Backend)"
                 value={skill.category}
@@ -105,7 +106,7 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
               />
               <button
                 onClick={() => removeSkill(skill._id!)}
-                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -114,8 +115,8 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
             {/* Skills List with Sliders */}
             <div className="space-y-3 mb-4">
               {skill.items.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                  <span className="text-sm font-semibold text-slate-700 w-24 truncate" title={item.name}>
+                <div key={i} className="flex items-center gap-3 bg-muted/50 p-3 rounded-xl border border-border">
+                  <span className="text-sm font-semibold text-foreground w-24 truncate" title={item.name}>
                     {item.name}
                   </span>
                   <Slider
@@ -126,12 +127,12 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
                     onValueChange={(val: number[]) => updateSkillLevel(skill._id!, i, val[0])}
                     className="flex-1 cursor-pointer"
                   />
-                  <span className="text-xs font-bold text-blue-600 w-10 text-right">
+                  <span className="text-xs font-bold text-primary w-10 text-right">
                     {item.level}%
                   </span>
                   <button
                     onClick={() => removeSkillItem(skill._id!, i)}
-                    className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                    className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -153,11 +154,11 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
                     }
                   }}
                   placeholder="Type a skill (e.g., React) and press Enter..."
-                  className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                  className="flex-1 px-3 py-2 bg-background border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                 />
                 <button
                   onClick={() => addSkillItem(skill._id!)}
-                  className="px-3 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-200 transition-colors"
+                  className="px-3 py-2 bg-primary/10 text-primary text-sm font-semibold rounded-lg hover:bg-primary/20 transition-colors"
                 >
                   Add
                 </button>
@@ -165,7 +166,7 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
 
               {/* 🚀 Suggestions Dropdown 🚀 */}
               {filteredSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-popover text-popover-foreground border border-border rounded-xl shadow-lg z-50 overflow-hidden">
                   {filteredSuggestions.map((sug) => (
                     <button
                       key={sug}
@@ -178,9 +179,9 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
                           setInputValues(prev => ({ ...prev, [skill._id!]: "" }));
                         }
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2"
                     >
-                      <Plus className="w-3.5 h-3.5 text-slate-400" />
+                      <Plus className="w-3.5 h-3.5 text-muted-foreground" />
                       {sug}
                     </button>
                   ))}
@@ -194,7 +195,7 @@ export default function SkillsStep({ errors = {} }: SkillsStepProps) {
       {data.skills.length > 0 && (
         <button
           onClick={addSkill}
-          className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 border-2 border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add another category

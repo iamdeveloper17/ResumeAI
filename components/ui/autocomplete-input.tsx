@@ -41,7 +41,7 @@ export default function AutocompleteInput({
   // Scroll highlighted into view
   useEffect(() => {
     if (highlightIndex >= 0 && listRef.current) {
-      const item = listRef.current.children[highlightIndex] as HTMLElement;
+      const item = listRef.current.children[highlightIndex + 1] as HTMLElement; // +1 because of sticky header
       item?.scrollIntoView({ block: "nearest" });
     }
   }, [highlightIndex]);
@@ -104,7 +104,8 @@ export default function AutocompleteInput({
     return (
       <>
         {text.slice(0, index)}
-        <span className="font-semibold text-blue-600">
+        {/* 🎯 FIX: text-blue-600 ko text-primary kiya taaki theme ke sath match kare */}
+        <span className="font-semibold text-primary">
           {text.slice(index, index + q.length)}
         </span>
         {text.slice(index + q.length)}
@@ -117,10 +118,11 @@ export default function AutocompleteInput({
       <input
         ref={inputRef}
         className={cn(
-          "w-full px-3 py-2 bg-white border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all",
+          // 🎯 FIX: bg-white -> bg-background, text-foreground add kiya
+          "w-full px-3 py-2 bg-background text-foreground border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all",
           error
-            ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-            : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10",
+            ? "border-destructive focus:border-destructive focus:ring-destructive/10"
+            : "border-input focus:border-primary focus:ring-primary/10",
           className
         )}
         placeholder={placeholder}
@@ -139,9 +141,11 @@ export default function AutocompleteInput({
       {isOpen && filtered.length > 0 && (
         <div
           ref={listRef}
-          className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto"
+          // 🎯 FIX: bg-white -> bg-popover, text-popover-foreground, border-border
+          className="absolute top-full left-0 right-0 mt-1 bg-popover text-popover-foreground border border-border rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto"
         >
-          <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 sticky top-0 bg-white">
+          {/* 🎯 FIX: Header bg updated */}
+          <div className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-b border-border sticky top-0 bg-popover">
             {value.trim() ? "Suggestions" : "Popular"}
           </div>
           {filtered.map((suggestion, idx) => (
@@ -153,9 +157,10 @@ export default function AutocompleteInput({
               onMouseEnter={() => setHighlightIndex(idx)}
               className={cn(
                 "w-full text-left px-3 py-2 text-sm transition-colors",
+                // 🎯 FIX: Hover aur highlight colors updated (bg-accent, text-accent-foreground)
                 idx === highlightIndex
-                  ? "bg-blue-50"
-                  : "text-slate-700 hover:bg-slate-50"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
               {highlightMatch(suggestion, value)}
@@ -164,7 +169,7 @@ export default function AutocompleteInput({
         </div>
       )}
 
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
     </div>
   );
 }
