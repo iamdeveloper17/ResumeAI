@@ -10,6 +10,11 @@ export interface IUser extends Document {
   aiCredits: number;
   creditsResetAt: Date;
   provider: "credentials" | "google";
+  
+  // 🎯 Naye fields Password Reset ke liye
+  resetToken?: string | null;
+  resetTokenExpiry?: Date | null;
+  
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,7 +36,7 @@ const UserSchema = new Schema<IUser>(
     password: {
       type: String,
       minlength: 6,
-      select: false,
+      select: false, // Security: By default password fetch nahi hoga
     },
     image: String,
     plan: {
@@ -51,6 +56,16 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ["credentials", "google"],
       default: "credentials",
+    },
+    
+    // 🎯 Naye fields schema me add kiye
+    resetToken: {
+      type: String,
+      default: null,
+    },
+    resetTokenExpiry: {
+      type: Date,
+      default: null,
     },
   },
   {

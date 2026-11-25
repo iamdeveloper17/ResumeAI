@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   FileText,
@@ -8,20 +10,28 @@ import {
   ArrowRight,
   Star,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    // 🎯 Main background theme-aware
+    <main className="min-h-screen bg-background text-foreground transition-colors">
+      
       {/* ─── Navbar ─── */}
-      <nav className="border-b border-border bg-white/80 backdrop-blur-lg sticky top-0 z-40">
+      <nav className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-40 transition-colors">
         <div className="container flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/30 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg tracking-tight">ResumeAI</span>
+            <span className="font-bold text-lg tracking-tight text-foreground">
+              ResumeAI
+            </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* 🚀 Theme Toggle */}
+            <ThemeToggle />
+            
             <Link
               href="/login"
               className="px-3 sm:px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -30,7 +40,7 @@ export default function Home() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:opacity-90 transition-colors shadow-sm"
             >
               Get Started
               <ArrowRight className="w-3.5 h-3.5 hidden sm:block" />
@@ -41,28 +51,28 @@ export default function Home() {
 
       {/* ─── Hero ─── */}
       <section className="relative overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/40 rounded-full blur-3xl" />
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
 
         <div className="container relative py-20 md:py-32">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 border border-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-primary/10 border border-primary/20 text-primary rounded-full text-xs sm:text-sm font-medium">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               Powered by Google Gemini AI
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] text-slate-900">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] text-foreground">
               Build your perfect resume
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 dark:from-blue-400 dark:via-blue-300 dark:to-purple-400 bg-clip-text text-transparent">
                 with AI in minutes
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Generate professional summaries, enhance bullet points, and
               export beautiful PDFs — all powered by AI. No design skills
               required.
@@ -71,7 +81,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-blue-600 text-white text-sm sm:text-base font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground text-sm sm:text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-0.5"
               >
                 Start Building Free
                 <ArrowRight className="w-4 h-4" />
@@ -80,13 +90,13 @@ export default function Home() {
                 href="https://github.com/iamdeveloper17"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white text-slate-900 text-sm sm:text-base font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-background text-foreground text-sm sm:text-base font-semibold rounded-xl border border-border hover:bg-muted transition-all hover:-translate-y-0.5"
               >
                 View on GitHub
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-8 text-sm text-slate-500">
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500" />
                 Free forever
@@ -105,7 +115,7 @@ export default function Home() {
       </section>
 
       {/* ─── Stats ─── */}
-      <section className="border-y border-slate-100 bg-slate-50/50">
+      <section className="border-y border-border bg-muted/30">
         <div className="container py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -115,10 +125,10 @@ export default function Home() {
               { value: "100%", label: "Free to start" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
-                <p className="text-2xl sm:text-3xl font-bold text-slate-900">
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">
                   {stat.value}
                 </p>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   {stat.label}
                 </p>
               </div>
@@ -130,14 +140,14 @@ export default function Home() {
       {/* ─── Features ─── */}
       <section className="container py-16 md:py-24">
         <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-xs font-medium mb-4 text-slate-700">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-xs font-medium mb-4 text-muted-foreground">
             <Sparkles className="w-3 h-3" />
             FEATURES
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight text-slate-900">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight text-foreground">
             Everything you need to get hired
           </h2>
-          <p className="text-slate-500 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Powerful features to help you land your dream job faster
           </p>
         </div>
@@ -173,17 +183,17 @@ export default function Home() {
             return (
               <div
                 key={i}
-                className="group relative bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-1 transition-all duration-300"
+                className="group relative bg-card text-card-foreground rounded-2xl border border-border p-6 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
               >
                 <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}
+                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}
                 >
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold mb-2 text-lg text-slate-900">
+                <h3 className="font-semibold mb-2 text-lg text-foreground">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-slate-500 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {feature.desc}
                 </p>
               </div>
@@ -193,13 +203,13 @@ export default function Home() {
       </section>
 
       {/* ─── How It Works ─── */}
-      <section className="bg-slate-50/50 border-y border-slate-100">
+      <section className="bg-muted/30 border-y border-border">
         <div className="container py-16 md:py-24">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight text-slate-900">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight text-foreground">
               Build your resume in 3 steps
             </h2>
-            <p className="text-slate-500">
+            <p className="text-muted-foreground">
               From blank page to interview-ready in under 10 minutes
             </p>
           </div>
@@ -223,13 +233,13 @@ export default function Home() {
               },
             ].map((item, i) => (
               <div key={i} className="relative text-center">
-                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold text-lg mb-4 shadow-lg shadow-blue-600/30">
+                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground font-bold text-lg mb-4 shadow-lg shadow-primary/30">
                   {item.step}
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-slate-900">
+                <h3 className="text-lg font-semibold mb-2 text-foreground">
                   {item.title}
                 </h3>
-                <p className="text-sm text-slate-500 max-w-xs mx-auto">
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                   {item.desc}
                 </p>
               </div>
@@ -241,11 +251,11 @@ export default function Home() {
       {/* ─── Testimonials ─── */}
       <section className="container py-16 md:py-24">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-xs font-medium mb-4 text-slate-700">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-xs font-medium mb-4 text-muted-foreground">
             <Star className="w-3 h-3" />
             TESTIMONIALS
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight text-slate-900">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 tracking-tight text-foreground">
             Loved by job seekers
           </h2>
         </div>
@@ -273,7 +283,7 @@ export default function Home() {
           ].map((t, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border border-slate-200 p-6"
+              className="bg-card text-card-foreground rounded-2xl border border-border p-6 transition-colors"
             >
               <div className="flex items-center gap-1 mb-3">
                 {[1, 2, 3, 4, 5].map((s) => (
@@ -283,18 +293,18 @@ export default function Home() {
                   />
                 ))}
               </div>
-              <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+              <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                 "{t.text}"
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
                   {t.initials}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-foreground">
                     {t.name}
                   </p>
-                  <p className="text-xs text-slate-500">{t.role}</p>
+                  <p className="text-xs text-muted-foreground">{t.role}</p>
                 </div>
               </div>
             </div>
@@ -330,34 +340,34 @@ export default function Home() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="border-t border-slate-100 bg-slate-50/50">
+      <footer className="border-t border-border bg-muted/30">
         <div className="container py-12">
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-bold text-slate-900">ResumeAI</span>
+                <span className="font-bold text-foreground">ResumeAI</span>
               </Link>
-              <p className="text-sm text-slate-500 max-w-xs">
+              <p className="text-sm text-muted-foreground max-w-xs">
                 AI-powered resume builder for modern job seekers. Land your
                 dream job faster.
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold text-sm mb-3 text-slate-900">
+              <h4 className="font-semibold text-sm mb-3 text-foreground">
                 Product
               </h4>
-              <ul className="space-y-2 text-sm text-slate-500">
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/register" className="hover:text-slate-900">
+                  <Link href="/register" className="hover:text-foreground transition-colors">
                     Get Started
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900">
+                  <Link href="/login" className="hover:text-foreground transition-colors">
                     Login
                   </Link>
                 </li>
@@ -366,7 +376,7 @@ export default function Home() {
                     href="https://github.com/iamdeveloper17"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-slate-900"
+                    className="hover:text-foreground transition-colors"
                   >
                     GitHub
                   </a>
@@ -375,16 +385,16 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-sm mb-3 text-slate-900">
+              <h4 className="font-semibold text-sm mb-3 text-foreground">
                 Connect
               </h4>
-              <ul className="space-y-2 text-sm text-slate-500">
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a
                     href="https://linkedin.com/in/amit-kumar-9193b0216"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-slate-900"
+                    className="hover:text-foreground transition-colors"
                   >
                     LinkedIn
                   </a>
@@ -392,7 +402,7 @@ export default function Home() {
                 <li>
                   <a
                     href="mailto:ramit5752@gmail.com"
-                    className="hover:text-slate-900"
+                    className="hover:text-foreground transition-colors"
                   >
                     Contact
                   </a>
@@ -401,7 +411,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
             <p>© {new Date().getFullYear()} ResumeAI. All rights reserved.</p>
             <p>Built with Next.js + TypeScript + Google Gemini AI</p>
           </div>

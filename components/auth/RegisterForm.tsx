@@ -7,12 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, ArrowLeft, Mail, Lock, Eye, EyeOff, User } from "lucide-react"; // 🎯 Icons import kiye
 import { registerSchema, type RegisterInput } from "@/lib/validations";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 🎯 Password toggle ke liye
 
   const {
     register,
@@ -51,7 +52,7 @@ export default function RegisterForm() {
         return;
       }
 
-      toast.success("Welcome to ResumeAI!");
+      toast.success("Welcome to ResumeAI! 🎉");
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
@@ -61,94 +62,141 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="w-full animate-fade-in">
-      {/* Logo + heading */}
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/30">
-          <Sparkles className="w-6 h-6 text-white" />
+    <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* 🎯 Premium Back Button */}
+      <Link 
+        href="/" 
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-transparent hover:border-border hover:bg-muted text-sm font-semibold text-muted-foreground hover:text-foreground mb-8 transition-all duration-300 group shadow-sm hover:shadow"
+      >
+        <div className="w-6 h-6 rounded-full bg-background border border-border flex items-center justify-center group-hover:-translate-x-1 transition-transform">
+          <ArrowLeft className="w-3.5 h-3.5" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">
-          Create your account
+        Back to home
+      </Link>
+
+      {/* 🎯 Header Section */}
+      <div className="text-center mb-8">
+        <div className="relative inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-5">
+          <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+          <Sparkles className="w-7 h-7 text-primary relative z-10" />
+        </div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground mb-2">
+          Create an account
         </h1>
-        <p className="text-sm text-slate-500">
-          Start building AI-powered resumes in seconds
+        <p className="text-sm text-muted-foreground">
+          Join us and start building AI-powered resumes
         </p>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Full name
-          </label>
-          <input
-            {...register("name")}
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:opacity-50"
-            placeholder="John Doe"
+      {/* 🎯 Main Form Card */}
+      <div className="bg-card/50 backdrop-blur-sm border border-border rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          
+          {/* Full Name Field */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Full Name
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <User className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              </div>
+              <input
+                {...register("name")}
+                type="text"
+                className="w-full pl-10 pr-4 py-3 bg-background border border-input rounded-xl text-sm transition-all focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-border-hover placeholder:text-muted-foreground/70 disabled:opacity-50"
+                placeholder="John Doe"
+                disabled={loading}
+              />
+            </div>
+            {errors.name && (
+              <p className="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
+
+          {/* Email Field */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Email address
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Mail className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              </div>
+              <input
+                {...register("email")}
+                type="email"
+                className="w-full pl-10 pr-4 py-3 bg-background border border-input rounded-xl text-sm transition-all focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-border-hover placeholder:text-muted-foreground/70 disabled:opacity-50"
+                placeholder="you@example.com"
+                disabled={loading}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Password
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Lock className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              </div>
+              <input
+                {...register("password")}
+                type={showPassword ? "text" : "password"} // 🎯 Password toggle logic
+                className="w-full pl-10 pr-11 py-3 bg-background border border-input rounded-xl text-sm transition-all focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-border-hover placeholder:text-muted-foreground/70 disabled:opacity-50"
+                placeholder="Min 6 characters"
+                disabled={loading}
+              />
+              {/* Password Show/Hide Button */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full py-3.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2 mt-2"
             disabled={loading}
-          />
-          {errors.name && (
-            <p className="text-xs text-red-500 mt-1.5">{errors.name.message}</p>
-          )}
-        </div>
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              "Create account"
+            )}
+          </button>
+        </form>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Email
-          </label>
-          <input
-            {...register("email")}
-            type="email"
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:opacity-50"
-            placeholder="you@example.com"
-            disabled={loading}
-          />
-          {errors.email && (
-            <p className="text-xs text-red-500 mt-1.5">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Password
-          </label>
-          <input
-            {...register("password")}
-            type="password"
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:opacity-50"
-            placeholder="Min 6 characters"
-            disabled={loading}
-          />
-          {errors.password && (
-            <p className="text-xs text-red-500 mt-1.5">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Creating account...
-            </>
-          ) : (
-            "Create account"
-          )}
-        </button>
-      </form>
-
-      <p className="text-center text-sm text-slate-500 mt-6">
+      {/* 🎯 Footer Link */}
+      <p className="text-center text-sm text-muted-foreground mt-8">
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-blue-600 font-semibold hover:text-blue-700"
+          className="text-primary font-bold hover:underline decoration-2 underline-offset-4"
         >
           Sign in
         </Link>

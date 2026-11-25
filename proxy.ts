@@ -4,7 +4,14 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 // Public routes — login ki zaroorat nahi
-const PUBLIC_ROUTES = ["/", "/login", "/register"];
+// 🎯 Added: forgot-password aur reset-password
+const PUBLIC_ROUTES = [
+  "/", 
+  "/login", 
+  "/register", 
+  "/forgot-password", 
+  "/reset-password"
+];
 
 // Auth routes — logged in user ko yahan nahi aane dena
 const AUTH_ROUTES = ["/login", "/register"];
